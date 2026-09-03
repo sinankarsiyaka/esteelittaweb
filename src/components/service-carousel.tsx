@@ -25,6 +25,8 @@ type CarouselLayout = {
   lift: number;
   lead: number;
   controlGap: number;
+  spreadPower: number;
+  outerShrink: number;
   offset: number;
   perspective: number;
 };
@@ -35,6 +37,13 @@ const SLOT_ANGLE = 45;
 // kart genişliğine bağlandığı için dizilim her genişlikte aynı kalır:
 // baskın merkez kart, iki destek kartı, iki kısmi devam kartı.
 const RADIUS_RATIO = 1.345;
+// Geniş ekranda referanstaki dizilim: kartlar birbirinden ayrılır ve dış
+// kartlar kenarlara yaklaşır. Dairesel yay bu oranı tek başına veremediği
+// için yatay eşleme |sin|^p ile yassılaştırılır. p ve yarıçap oranı 920px'ten
+// 1440px'e doğru rampalanır, böylece tablet kompozisyonu birebir korunur.
+const WIDE_RADIUS_RATIO = 1.9;
+const WIDE_SPREAD_POWER = 1.76;
+const WIDE_OUTER_SHRINK = 0.133;
 const DEPTH_RATIO = 0.674;
 const FAR_DEPTH_RATIO = 0.247;
 const LIFT_RATIO = 0.0808;
@@ -42,10 +51,10 @@ const PERSPECTIVE_RATIO = 4.85;
 
 // Tablet ölçeğinin üst sınırı ve 1200px'ten sonra eklenen genişlik.
 const BASE_MAX_CARD = 238;
-const WIDE_EXTRA_CARD = 62;
+const WIDE_EXTRA_CARD = 102;
 // Baskın kartın üst kenarı ortalanmış CTA satırına dayanmasın diye sahne
-// aşağı alınır. 920px'te hero satır yapısı 410px'ten minmax(500px,1fr)'e
-// geçtiği için carousel 24px yukarı kayar; bu paylar o kaymayı da dengeler.
+// aşağı alınır. Merkez kompozisyonun tamamında aynı değerdir; kırılıma bağlı
+// olmadığı için 919/920 geçişinde dikey sıçrama oluşturmaz.
 const LEAD = 22;
 const WIDE_LEAD = 4;
 
@@ -86,6 +95,8 @@ function getLayout(viewportWidth: number, viewportHeight: number): CarouselLayou
       lift: 18,
       lead: 0,
       controlGap: getControlGap(viewportHeight),
+      spreadPower: 1,
+      outerShrink: 0,
       offset: 0,
       perspective: 920,
     };
@@ -94,22 +105,26 @@ function getLayout(viewportWidth: number, viewportHeight: number): CarouselLayou
   // 650px ve üzerinde tek bir kompozisyon var. 1200px'e kadar tablet
   // ölçeği geçerlidir; sonrasında aynı hiyerarşi geniş ekrana açılır.
   const base = Math.min(BASE_MAX_CARD, viewportWidth * 0.29);
-  const wide = clamp01((viewportWidth - 1200) / 240);
+  // 920px'te 0, 1440px'te 1. 919/920 sınırında değeri 0 olduğu için o
+  // geçişte hiçbir parametre sıçramaz.
+  const wide = clamp01((viewportWidth - 920) / 520);
   // Kart, hero'nun carousel satırına sığmalı; kısa pencerelerde tablet
   // ölçeğinin altına inmeden büyümeyi durdurur.
-  const byHeight = (viewportHeight - 470) / 1.43;
+  const byHeight = (viewportHeight - 300) / 1.43;
   const cardWidth = Math.max(base, Math.min(base + wide * WIDE_EXTRA_CARD, byHeight));
 
   return {
     mode: "center",
     cardWidth,
     cardHeight: cardWidth * 1.43,
-    radius: cardWidth * RADIUS_RATIO,
+    radius: cardWidth * (RADIUS_RATIO + wide * (WIDE_RADIUS_RATIO - RADIUS_RATIO)),
     depth: cardWidth * DEPTH_RATIO,
     farDepth: cardWidth * FAR_DEPTH_RATIO,
     lift: cardWidth * LIFT_RATIO,
-    lead: viewportWidth < 920 ? 0 : LEAD + wide * WIDE_LEAD,
+    lead: LEAD + wide * WIDE_LEAD,
     controlGap: getControlGap(viewportHeight),
+    spreadPower: 1 + wide * (WIDE_SPREAD_POWER - 1),
+    outerShrink: wide * WIDE_OUTER_SHRINK,
     offset: -45,
     perspective: cardWidth * PERSPECTIVE_RATIO,
   };
@@ -127,12 +142,18 @@ function getTransform(angle: number, layout: CarouselLayout) {
   const radians = (angle * Math.PI) / 180;
   const distance = Math.abs(angle) / SLOT_ANGLE;
 
-  const x = Math.sin(radians) * layout.radius;
+  const sine = Math.sin(radians);
+  const x =
+    Math.sign(sine) * Math.abs(sine) ** layout.spreadPower * layout.radius;
   const centerProgress = Math.min(distance, 1);
-  const scale = 1 - centerProgress * (layout.mode === "phone" ? 0.28 : 0.22);
-  const z =
-    -centerProgress * layout.depth -
-    Math.max(distance - 1, 0) * layout.farDepth;
+  const outer = Math.max(distance - 1, 0);
+  const scale = Math.max(
+    1 -
+      centerProgress * (layout.mode === "phone" ? 0.28 : 0.22) -
+      outer * layout.outerShrink,
+    0.2,
+  );
+  const z = -centerProgress * layout.depth - outer * layout.farDepth;
   const y = centerProgress * layout.lift;
   const yaw = -angle * 0.34;
 

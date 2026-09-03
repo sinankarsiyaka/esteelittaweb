@@ -32,7 +32,6 @@ export default function Home() {
           <nav className="desktop-nav" aria-label="Ana menü">
             <a href="#hakkimizda">Hakkımızda</a>
             <a href="#hizmetler">Hizmetler</a>
-            <a href="#galeri">Galeri</a>
             <a href="#iletisim">İletişim</a>
           </nav>
 
@@ -66,7 +65,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="service-story section-shell" id="galeri">
+      <section className="service-story section-shell">
         <div className="section-intro">
           <p className="section-kicker">Size özel bakım ritüelleri</p>
           <h2>Her dokunuş, size özel.</h2>

@@ -5,7 +5,6 @@ import { useEffect, useId, useRef, useState } from "react";
 const links = [
   ["#hakkimizda", "Hakkımızda"],
   ["#hizmetler", "Hizmetler"],
-  ["#galeri", "Galeri"],
   ["#iletisim", "İletişim"],
 ] as const;
 
