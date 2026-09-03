@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Kurulu üçüncü taraf skill dosyaları; proje kaynağı değil.
+    ".agents/**",
+    ".claude/**",
   ]),
 ]);
 

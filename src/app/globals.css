@@ -14,6 +14,10 @@
   --line: rgba(23, 107, 120, 0.16);
   --shadow: 0 34px 70px rgba(28, 116, 132, 0.13);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Bölümler arası dikey ritim. Sabit piksel yerine ekranla ölçeklenir:
+     390px'te 56px, 1024px'te 59px, 1450px ve üzerinde 84px. */
+  --section-pad: clamp(56px, 5.8vw, 84px);
 }
 
 * {
@@ -536,8 +540,7 @@ main {
   grid-template-columns: minmax(280px, 0.8fr) minmax(460px, 1.25fr);
   gap: clamp(70px, 10vw, 160px);
   align-items: center;
-  min-height: 820px;
-  padding-block: 130px 150px;
+  padding-block: var(--section-pad);
 }
 
 .section-intro {
@@ -632,7 +635,7 @@ main {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
   gap: 70px;
-  padding-block: 140px 130px;
+  padding-block: var(--section-pad);
 }
 
 .brand-story h2 {
@@ -655,8 +658,7 @@ main {
 }
 
 .value-item {
-  min-height: 210px;
-  padding: 27px 28px 0 0;
+  padding: 27px 28px 20px 0;
   border-right: 1px solid var(--line);
 }
 
@@ -694,7 +696,7 @@ main {
   grid-template-columns: 1.25fr 0.75fr;
   gap: 90px;
   align-items: end;
-  padding-block: 150px;
+  padding-block: var(--section-pad);
 }
 
 .contact-band h2 {
@@ -782,8 +784,6 @@ main {
   .service-story {
     grid-template-columns: 0.82fr 1.18fr;
     gap: 48px;
-    min-height: 730px;
-    padding-block: 100px;
   }
 
   .editorial-collage {
@@ -807,7 +807,6 @@ main {
   .brand-story__inner {
     grid-template-columns: 1fr;
     gap: 24px;
-    padding-block: 100px 90px;
   }
 
   .brand-story__copy {
@@ -829,7 +828,6 @@ main {
   .contact-band {
     grid-template-columns: 1fr;
     gap: 35px;
-    padding-block: 110px;
   }
 }
 
@@ -896,10 +894,6 @@ main {
     min-height: 430px;
   }
 
-  .service-carousel__stage {
-    inset-bottom: 50px;
-  }
-
   .service-card {
     border-radius: 20px;
   }
@@ -924,8 +918,6 @@ main {
   .service-story {
     grid-template-columns: 1fr;
     gap: 65px;
-    min-height: auto;
-    padding-block: 100px 130px;
   }
 
   .section-intro h2,
@@ -960,7 +952,6 @@ main {
 
   .value-item,
   .value-item + .value-item {
-    min-height: 170px;
     padding: 24px 0;
     border-right: 0;
     border-bottom: 1px solid var(--line);
@@ -976,10 +967,6 @@ main {
 
   .value-item h3 {
     margin-top: 25px;
-  }
-
-  .contact-band {
-    padding-block: 100px;
   }
 
   .site-footer {
