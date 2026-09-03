@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { MobileMenu } from "@/components/mobile-menu";
 import { ServiceCarousel } from "@/components/service-carousel";
 
 const values = [
@@ -39,9 +40,7 @@ export default function Home() {
             Randevu Al
           </a>
 
-          <a className="menu-link" href="#hizmetler" aria-label="Hizmetler menüsünü aç">
-            Menü
-          </a>
+          <MobileMenu />
         </header>
 
         <div className="hero-copy">

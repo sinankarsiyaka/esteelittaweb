@@ -6,11 +6,11 @@
   --mist: #eaf9fc;
   --mist-strong: #d7f2f7;
   --turquoise: #49bed2;
-  --turquoise-deep: #279db2;
+  --turquoise-deep: #1c7d90;
   --magenta: #d71986;
   --deep-teal: #176b78;
   --ink: #123f48;
-  --muted: #68858c;
+  --muted: #567279;
   --line: rgba(23, 107, 120, 0.16);
   --shadow: 0 34px 70px rgba(28, 116, 132, 0.13);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -210,8 +210,79 @@ main {
   padding-inline: 22px;
 }
 
-.menu-link {
+.mobile-menu {
+  position: relative;
   display: none;
+  justify-self: end;
+}
+
+.menu-link {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--deep-teal);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.menu-link svg {
+  transition: transform 220ms var(--ease-out-expo);
+}
+
+.menu-link[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+/* Panel akıştan çıkarılmıştır; açılıp kapanması sayfayı yeniden konumlandırmaz. */
+.mobile-menu__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  gap: 2px;
+  min-width: 212px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  box-shadow: 0 20px 44px rgba(20, 85, 96, 0.16);
+}
+
+.mobile-menu__panel[hidden] {
+  display: none;
+}
+
+.mobile-menu__panel nav {
+  display: grid;
+  gap: 2px;
+}
+
+.mobile-menu__panel nav a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 7px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 160ms ease;
+}
+
+.mobile-menu__panel nav a:hover {
+  background: var(--mist);
+}
+
+.mobile-menu__panel .button {
+  margin-top: 6px;
 }
 
 .hero-copy {
@@ -375,6 +446,7 @@ main {
 }
 
 .carousel-arrow {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -393,6 +465,10 @@ main {
     background-color 180ms ease;
 }
 
+.carousel-arrow svg {
+  fill: currentColor;
+}
+
 .carousel-arrow:hover {
   border-color: var(--turquoise);
   background: white;
@@ -401,6 +477,19 @@ main {
 
 .carousel-arrow:active {
   transform: scale(0.94);
+}
+
+/* Görünen boyutu değiştirmeden dokunma hedefini 44x44'e tamamlar (WCAG 2.5.8). */
+.carousel-arrow::before,
+.text-link::before,
+.site-footer a::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  content: "";
+  transform: translate(-50%, -50%);
 }
 
 .drag-cue {
@@ -673,12 +762,8 @@ main {
     display: none;
   }
 
-  .menu-link {
+  .mobile-menu {
     display: block;
-    justify-self: end;
-    color: var(--deep-teal);
-    font-size: 13px;
-    font-weight: 500;
   }
 
   .hero-copy {

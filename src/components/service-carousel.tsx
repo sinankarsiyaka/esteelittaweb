@@ -120,12 +120,15 @@ function ServiceCard({
   index,
   rotation,
   layout,
+  playing,
 }: {
   service: Service;
   index: number;
   rotation: MotionValue<number>;
   layout: CarouselLayout;
+  playing: boolean;
 }) {
+  const cardRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const transform = useTransform(rotation, (value) =>
     getTransform(cardAngle(value, index, layout.offset), layout),
@@ -143,14 +146,27 @@ function ServiceCard({
   });
 
   useEffect(() => {
-    const updatePlayback = (value: number) => {
+    const update = (value: number) => {
+      const angle = cardAngle(value, index, layout.offset);
+
+      // Tamamen sönmüş kartlar ekran okuyucuya da kapatılır. Rotasyon her
+      // karede değiştiği için durum React state'i yerine doğrudan DOM'a
+      // yazılır; aksi halde her kare sekiz kartı yeniden render ederdi.
+      const card = cardRef.current;
+      if (card) {
+        if (getOpacity(angle, layout.mode) === 0) {
+          card.setAttribute("aria-hidden", "true");
+        } else {
+          card.removeAttribute("aria-hidden");
+        }
+      }
+
       const video = videoRef.current;
       if (!video) return;
 
       const visibleLimit =
         layout.mode === "desktop" ? 84 : layout.mode === "tablet" ? 58 : 24;
-      const shouldPlay =
-        Math.abs(cardAngle(value, index, layout.offset)) <= visibleLimit;
+      const shouldPlay = playing && Math.abs(angle) <= visibleLimit;
 
       if (shouldPlay) {
         void video.play().catch(() => undefined);
@@ -159,12 +175,13 @@ function ServiceCard({
       }
     };
 
-    updatePlayback(rotation.get());
-    return rotation.on("change", updatePlayback);
-  }, [index, layout.mode, layout.offset, rotation]);
+    update(rotation.get());
+    return rotation.on("change", update);
+  }, [index, layout.mode, layout.offset, playing, rotation]);
 
   return (
     <motion.article
+      ref={cardRef}
       className="service-card"
       style={{
         width: layout.cardWidth,
@@ -174,7 +191,6 @@ function ServiceCard({
         opacity,
         zIndex,
       }}
-      aria-label={service.name}
     >
       <video
         ref={videoRef}
@@ -189,7 +205,7 @@ function ServiceCard({
         disablePictureInPicture
       />
       <div className="service-card__shade" />
-      <h2 className="service-card__title">{service.name}</h2>
+      <p className="service-card__title">{service.name}</p>
     </motion.article>
   );
 }
@@ -198,6 +214,14 @@ export function ServiceCarousel() {
   const [viewportWidth, setViewportWidth] = useState(1440);
   const [ready, setReady] = useState(false);
   const reducedMotion = useReducedMotion();
+  // null = sistem tercihini izle. Kullanıcı düğmeye bastığında tercih
+  // sabitlenir, böylece azaltılmış hareket açıkken de elle oynatabilir.
+  const [autoplay, setAutoplay] = useState<boolean | null>(null);
+  // useReducedMotion sunucuda null, istemcide ilk render'da gerçek değeri
+  // döndürür. Düğmenin ikonu ve etiketi buna bağlı olduğundan, ölçüm
+  // tamamlanana kadar iki tarafta da duraklatılmış hâl render edilir;
+  // aksi hâlde hidrasyon uyuşmazlığı oluşur (React #418).
+  const playing = ready ? autoplay ?? reducedMotion === false : false;
   const rotation = useMotionValue(0);
   const dragState = useRef({
     active: false,
@@ -304,6 +328,7 @@ export function ServiceCarousel() {
         onPointerCancel={handlePointerCancel}
         onKeyDown={handleKeyDown}
         tabIndex={0}
+        role="group"
         aria-label="Hizmet videoları. Ok tuşlarıyla veya sürükleyerek gezinin."
       >
         {services.map((service, index) => (
@@ -313,11 +338,33 @@ export function ServiceCarousel() {
             index={index}
             rotation={rotation}
             layout={layout}
+            playing={playing}
           />
         ))}
       </motion.div>
 
-      <div className="carousel-controls" aria-label="Hizmet carousel kontrolleri">
+      <div
+        className="carousel-controls"
+        role="group"
+        aria-label="Hizmet carousel kontrolleri"
+      >
+        <button
+          className="carousel-arrow"
+          type="button"
+          onClick={() => setAutoplay(!playing)}
+          aria-label={playing ? "Videoları duraklat" : "Videoları oynat"}
+        >
+          {playing ? (
+            <svg viewBox="0 0 14 14" width="12" height="12" aria-hidden="true">
+              <rect x="2" y="1.6" width="3.4" height="10.8" rx="1.1" />
+              <rect x="8.6" y="1.6" width="3.4" height="10.8" rx="1.1" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 14 14" width="12" height="12" aria-hidden="true">
+              <path d="M3.6 2.1v9.8a1 1 0 0 0 1.53.85l7.7-4.9a1 1 0 0 0 0-1.7l-7.7-4.9A1 1 0 0 0 3.6 2.1Z" />
+            </svg>
+          )}
+        </button>
         <button
           className="carousel-arrow"
           type="button"
