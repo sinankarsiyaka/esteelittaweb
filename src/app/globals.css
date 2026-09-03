@@ -441,7 +441,7 @@ main {
 
 .carousel-controls {
   position: absolute;
-  top: calc(var(--carousel-lead, 0px) + var(--card-height) + 48px);
+  top: calc(var(--carousel-lead, 0px) + var(--card-height) + var(--control-gap, 48px));
   right: 0;
   left: 0;
   z-index: 500;

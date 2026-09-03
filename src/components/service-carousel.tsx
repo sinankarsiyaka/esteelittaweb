@@ -24,6 +24,7 @@ type CarouselLayout = {
   farDepth: number;
   lift: number;
   lead: number;
+  controlGap: number;
   offset: number;
   perspective: number;
 };
@@ -48,8 +49,28 @@ const WIDE_EXTRA_CARD = 62;
 const LEAD = 22;
 const WIDE_LEAD = 4;
 
+// Kart ile kontrol şeridi arasındaki boşluk. Kısa pencerelerde şerit
+// fold'un altına düşmesin diye daralır; 844px ve üzeri yükseklikte 48px.
+const CONTROL_GAP_MIN = 24;
+const CONTROL_GAP_RANGE = 24;
+
+// Sürükleme: 1 hizmet = 45 derece. 0.19 ile 150-250px'lik normal bir
+// sürükleme 28-48 dereceye denk gelir, yani tam olarak bir hizmet.
+// Momentum payı yalnızca uzun ve hızlı sürüklemelerde ikinci hizmete
+// taşıyacak kadar bırakılmıştır.
+const DRAG_SENSITIVITY = { phone: 0.18, center: 0.19 } as const;
+// Telefonda flick davranışı korunur; fare sürüklemesinde momentum payı
+// yalnızca uzun ve hızlı hareketlerde ikinci hizmete taşıyacak kadardır.
+const MOMENTUM_PROJECTION = { phone: 0.08, center: 0.03 } as const;
+
 function clamp01(value: number) {
   return Math.min(Math.max(value, 0), 1);
+}
+
+function getControlGap(viewportHeight: number) {
+  return (
+    CONTROL_GAP_MIN + clamp01((viewportHeight - 700) / 144) * CONTROL_GAP_RANGE
+  );
 }
 
 function getLayout(viewportWidth: number, viewportHeight: number): CarouselLayout {
@@ -64,6 +85,7 @@ function getLayout(viewportWidth: number, viewportHeight: number): CarouselLayou
       farDepth: 55,
       lift: 18,
       lead: 0,
+      controlGap: getControlGap(viewportHeight),
       offset: 0,
       perspective: 920,
     };
@@ -87,6 +109,7 @@ function getLayout(viewportWidth: number, viewportHeight: number): CarouselLayou
     farDepth: cardWidth * FAR_DEPTH_RATIO,
     lift: cardWidth * LIFT_RATIO,
     lead: viewportWidth < 920 ? 0 : LEAD + wide * WIDE_LEAD,
+    controlGap: getControlGap(viewportHeight),
     offset: -45,
     perspective: cardWidth * PERSPECTIVE_RATIO,
   };
@@ -284,7 +307,7 @@ export function ServiceCarousel() {
     const now = performance.now();
     const deltaX = event.clientX - dragState.current.lastX;
     const elapsed = Math.max(now - dragState.current.lastTime, 8);
-    const sensitivity = layout.mode === "phone" ? 0.18 : 0.115;
+    const sensitivity = DRAG_SENSITIVITY[layout.mode];
     rotation.set(rotation.get() + deltaX * sensitivity);
     dragState.current.lastX = event.clientX;
     dragState.current.lastTime = now;
@@ -299,9 +322,10 @@ export function ServiceCarousel() {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
 
-    const sensitivity = layout.mode === "phone" ? 0.18 : 0.115;
+    const sensitivity = DRAG_SENSITIVITY[layout.mode];
     const projected =
-      rotation.get() + dragState.current.velocity * sensitivity * 0.08;
+      rotation.get() +
+      dragState.current.velocity * sensitivity * MOMENTUM_PROJECTION[layout.mode];
     settle(projected, dragState.current.velocity * sensitivity);
   }
 
@@ -324,6 +348,7 @@ export function ServiceCarousel() {
           perspective: layout.perspective,
           "--card-height": `${layout.cardHeight}px`,
           "--carousel-lead": `${layout.lead}px`,
+          "--control-gap": `${layout.controlGap}px`,
         } as CSSProperties
       }
     >
