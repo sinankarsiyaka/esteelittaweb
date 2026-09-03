@@ -13,7 +13,7 @@ import type { CSSProperties } from "react";
 
 import { services, type Service } from "@/data/services";
 
-type LayoutMode = "desktop" | "tablet" | "phone";
+type LayoutMode = "center" | "phone";
 
 type CarouselLayout = {
   mode: LayoutMode;
@@ -21,13 +21,38 @@ type CarouselLayout = {
   cardHeight: number;
   radius: number;
   depth: number;
+  farDepth: number;
+  lift: number;
+  lead: number;
   offset: number;
   perspective: number;
 };
 
 const SLOT_ANGLE = 45;
 
-function getLayout(viewportWidth: number): CarouselLayout {
+// 768px'teki tablet kompozisyonundan türetilen oranlar. Sahnenin tamamı
+// kart genişliğine bağlandığı için dizilim her genişlikte aynı kalır:
+// baskın merkez kart, iki destek kartı, iki kısmi devam kartı.
+const RADIUS_RATIO = 1.345;
+const DEPTH_RATIO = 0.674;
+const FAR_DEPTH_RATIO = 0.247;
+const LIFT_RATIO = 0.0808;
+const PERSPECTIVE_RATIO = 4.85;
+
+// Tablet ölçeğinin üst sınırı ve 1200px'ten sonra eklenen genişlik.
+const BASE_MAX_CARD = 238;
+const WIDE_EXTRA_CARD = 62;
+// Baskın kartın üst kenarı ortalanmış CTA satırına dayanmasın diye sahne
+// aşağı alınır. 920px'te hero satır yapısı 410px'ten minmax(500px,1fr)'e
+// geçtiği için carousel 24px yukarı kayar; bu paylar o kaymayı da dengeler.
+const LEAD = 22;
+const WIDE_LEAD = 4;
+
+function clamp01(value: number) {
+  return Math.min(Math.max(value, 0), 1);
+}
+
+function getLayout(viewportWidth: number, viewportHeight: number): CarouselLayout {
   if (viewportWidth < 650) {
     const cardWidth = Math.min(248, viewportWidth * 0.64);
     return {
@@ -36,33 +61,34 @@ function getLayout(viewportWidth: number): CarouselLayout {
       cardHeight: cardWidth * 1.43,
       radius: Math.min(270, viewportWidth * 0.68),
       depth: 92,
+      farDepth: 55,
+      lift: 18,
+      lead: 0,
       offset: 0,
       perspective: 920,
     };
   }
 
-  if (viewportWidth < 920) {
-    const cardWidth = Math.min(238, viewportWidth * 0.29);
-    return {
-      mode: "tablet",
-      cardWidth,
-      cardHeight: cardWidth * 1.43,
-      radius: viewportWidth * 0.39,
-      depth: 150,
-      offset: -45,
-      perspective: 1080,
-    };
-  }
+  // 650px ve üzerinde tek bir kompozisyon var. 1200px'e kadar tablet
+  // ölçeği geçerlidir; sonrasında aynı hiyerarşi geniş ekrana açılır.
+  const base = Math.min(BASE_MAX_CARD, viewportWidth * 0.29);
+  const wide = clamp01((viewportWidth - 1200) / 240);
+  // Kart, hero'nun carousel satırına sığmalı; kısa pencerelerde tablet
+  // ölçeğinin altına inmeden büyümeyi durdurur.
+  const byHeight = (viewportHeight - 470) / 1.43;
+  const cardWidth = Math.max(base, Math.min(base + wide * WIDE_EXTRA_CARD, byHeight));
 
-  const cardWidth = Math.min(286, viewportWidth * 0.19);
   return {
-    mode: "desktop",
+    mode: "center",
     cardWidth,
     cardHeight: cardWidth * 1.43,
-    radius: Math.min(500, viewportWidth * 0.32),
-    depth: 230,
-    offset: -67.5,
-    perspective: 1280,
+    radius: cardWidth * RADIUS_RATIO,
+    depth: cardWidth * DEPTH_RATIO,
+    farDepth: cardWidth * FAR_DEPTH_RATIO,
+    lift: cardWidth * LIFT_RATIO,
+    lead: viewportWidth < 920 ? 0 : LEAD + wide * WIDE_LEAD,
+    offset: -45,
+    perspective: cardWidth * PERSPECTIVE_RATIO,
   };
 }
 
@@ -78,28 +104,13 @@ function getTransform(angle: number, layout: CarouselLayout) {
   const radians = (angle * Math.PI) / 180;
   const distance = Math.abs(angle) / SLOT_ANGLE;
 
-  if (layout.mode === "desktop") {
-    const edgeProgress = Math.min(Math.abs(angle) / 67.5, 1);
-    const visibleAngle = Math.max(-67.5, Math.min(67.5, angle));
-    const visibleRadians = (visibleAngle * Math.PI) / 180;
-    const overflow =
-      Math.max(Math.abs(angle) - 67.5, 0) / 45 * layout.cardWidth * 1.5;
-    const x =
-      Math.sin(visibleRadians) * layout.radius + Math.sign(angle) * overflow;
-    const scale = 0.82 + edgeProgress * 0.29;
-    const z = -Math.cos(radians) * layout.depth;
-    const y = 16 - edgeProgress * 9;
-    const yaw = -angle * 0.27;
-    const roll = angle * 0.018;
-
-    return `translate3d(${x}px, ${y}px, ${z}px) rotateY(${yaw}deg) rotateZ(${roll}deg) scale(${scale})`;
-  }
-
   const x = Math.sin(radians) * layout.radius;
   const centerProgress = Math.min(distance, 1);
   const scale = 1 - centerProgress * (layout.mode === "phone" ? 0.28 : 0.22);
-  const z = -centerProgress * layout.depth - Math.max(distance - 1, 0) * 55;
-  const y = centerProgress * 18;
+  const z =
+    -centerProgress * layout.depth -
+    Math.max(distance - 1, 0) * layout.farDepth;
+  const y = centerProgress * layout.lift;
   const yaw = -angle * 0.34;
 
   return `translate3d(${x}px, ${y}px, ${z}px) rotateY(${yaw}deg) scale(${scale})`;
@@ -107,8 +118,8 @@ function getTransform(angle: number, layout: CarouselLayout) {
 
 function getOpacity(angle: number, mode: LayoutMode) {
   const absolute = Math.abs(angle);
-  const full = mode === "desktop" ? 112.5 : mode === "tablet" ? 56 : 22;
-  const hidden = mode === "desktop" ? 136 : mode === "tablet" ? 104 : 72;
+  const full = mode === "center" ? 56 : 22;
+  const hidden = mode === "center" ? 104 : 72;
 
   if (absolute <= full) return 1;
   if (absolute >= hidden) return 0;
@@ -136,14 +147,10 @@ function ServiceCard({
   const opacity = useTransform(rotation, (value) =>
     getOpacity(cardAngle(value, index, layout.offset), layout.mode),
   );
-  const zIndex = useTransform(rotation, (value) => {
-    const angle = Math.abs(cardAngle(value, index, layout.offset));
-    if (layout.mode === "desktop") {
-      if (angle <= 78) return Math.round(angle * 2 + 100);
-      return Math.round(100 - (angle - 78) * 3);
-    }
-    return Math.round(200 - angle * 2);
-  });
+  // Merkez kart en üstte, uzaklaştıkça arkaya doğru sıralanır.
+  const zIndex = useTransform(rotation, (value) =>
+    Math.round(200 - Math.abs(cardAngle(value, index, layout.offset)) * 2),
+  );
 
   useEffect(() => {
     const update = (value: number) => {
@@ -164,8 +171,7 @@ function ServiceCard({
       const video = videoRef.current;
       if (!video) return;
 
-      const visibleLimit =
-        layout.mode === "desktop" ? 84 : layout.mode === "tablet" ? 58 : 24;
+      const visibleLimit = layout.mode === "center" ? 58 : 24;
       const shouldPlay = playing && Math.abs(angle) <= visibleLimit;
 
       if (shouldPlay) {
@@ -211,7 +217,7 @@ function ServiceCard({
 }
 
 export function ServiceCarousel() {
-  const [viewportWidth, setViewportWidth] = useState(1440);
+  const [viewport, setViewport] = useState({ width: 1440, height: 900 });
   const [ready, setReady] = useState(false);
   const reducedMotion = useReducedMotion();
   // null = sistem tercihini izle. Kullanıcı düğmeye bastığında tercih
@@ -229,11 +235,11 @@ export function ServiceCarousel() {
     lastTime: 0,
     velocity: 0,
   });
-  const layout = getLayout(viewportWidth);
+  const layout = getLayout(viewport.width, viewport.height);
 
   useEffect(() => {
     const update = () => {
-      setViewportWidth(window.innerWidth);
+      setViewport({ width: window.innerWidth, height: window.innerHeight });
       setReady(true);
     };
 
@@ -317,6 +323,7 @@ export function ServiceCarousel() {
         {
           perspective: layout.perspective,
           "--card-height": `${layout.cardHeight}px`,
+          "--carousel-lead": `${layout.lead}px`,
         } as CSSProperties
       }
     >
