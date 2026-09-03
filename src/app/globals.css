@@ -117,15 +117,21 @@ main {
 }
 
 .brand {
-  display: inline-flex;
-  align-items: center;
+  position: relative;
+  display: block;
   justify-self: start;
   width: 184px;
   height: 64px;
-  overflow: visible;
 }
 
+/* Logonun en-boy oranı 1841:1247, yani 184px genişlikte 124.6px yüksekliğinde.
+   Kutu header satır yüksekliğini korumak için 64px kalır; görsel akıştan çıkarılıp
+   üstten hizalanır, böylece yalnızca aşağıdaki boş alana taşar, tepesi kırpılmaz. */
 .brand img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
   width: 100%;
   height: auto;
 }

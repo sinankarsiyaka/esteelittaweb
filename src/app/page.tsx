@@ -21,8 +21,9 @@ export default function Home() {
             <Image
               src="/brand/esteelitta-logo.png"
               alt="Esteelitta"
-              width={274}
-              height={186}
+              width={1841}
+              height={1247}
+              sizes="(max-width: 649px) 145px, (max-width: 919px) 162px, 184px"
               priority
             />
           </a>
