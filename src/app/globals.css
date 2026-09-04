@@ -1016,25 +1016,34 @@ main {
   text-underline-offset: 3px;
 }
 
-.contact__instagram-row {
+.contact__social {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 11px;
   width: fit-content;
   margin: 40px 0 0;
 }
 
-.contact__instagram-row span {
-  color: var(--ink);
-  font-size: 17px;
-  font-weight: 600;
+.contact__social-icon {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+.contact__social-icon .contact__icon {
+  width: 27px;
+  height: 27px;
 }
 
 .contact__cta {
-  margin-top: 32px;
-  min-height: 56px;
-  padding: 0 32px;
-  font-size: 15px;
+  margin-top: 0;
+  min-height: 43px;
+  padding: 0 18px;
+  font-size: 13.5px;
 }
 
 .contact__visual {
@@ -1413,20 +1422,15 @@ main {
     font-size: 13px;
   }
 
-  .contact__instagram-row {
+  .contact__social {
     margin-top: 36px;
-    gap: 16px;
-  }
-
-  .contact__instagram-row span {
-    font-size: 15px;
+    gap: 10px;
   }
 
   .contact__cta {
-    margin-top: 28px;
-    min-height: 48px;
-    padding: 0 26px;
-    font-size: 14px;
+    min-height: 42px;
+    padding: 0 16px;
+    font-size: 13px;
   }
 
   .about__heading {

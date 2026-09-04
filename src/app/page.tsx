@@ -227,32 +227,34 @@ export default function Home() {
             </div>
           </div>
 
-          <a
-            className="contact__instagram-row"
-            href={contactInstagramHref}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <svg
-              className="contact__icon"
-              viewBox="0 0 32 32"
-              aria-hidden="true"
+          <div className="contact__social">
+            <a
+              className="contact__social-icon"
+              href={contactInstagramHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Esteelitta Instagram hesabı (yeni sekmede açılır)"
             >
-              <rect x="5" y="5" width="22" height="22" rx="6" />
-              <circle cx="16" cy="16" r="5.6" />
-              <path d="M22 10h.01" />
-            </svg>
-            <span>@esteelitta_kucukyali</span>
-          </a>
+              <svg
+                className="contact__icon"
+                viewBox="0 0 32 32"
+                aria-hidden="true"
+              >
+                <rect x="5" y="5" width="22" height="22" rx="6" />
+                <circle cx="16" cy="16" r="5.6" />
+                <path d="M22 10h.01" />
+              </svg>
+            </a>
 
-          <a
-            className="button contact__cta"
-            href={contactInstagramHref}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Instagram’dan ulaşın ↗
-          </a>
+            <a
+              className="button contact__cta"
+              href={contactInstagramHref}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Instagram’dan ulaşın ↗
+            </a>
+          </div>
         </div>
 
         <div className="contact__visual">
