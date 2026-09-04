@@ -731,7 +731,6 @@ main {
   line-height: 1.55;
 }
 
-.brand-story h2,
 .contact-band h2 {
   margin: 17px 0 26px;
   font-family: var(--font-display), Georgia, serif;
@@ -741,7 +740,6 @@ main {
   letter-spacing: -0.05em;
 }
 
-.brand-story__copy,
 .contact-actions p {
   color: var(--muted);
   font-size: 15px;
@@ -749,81 +747,171 @@ main {
   line-height: 1.8;
 }
 
-.brand-story {
-  position: relative;
-  overflow: hidden;
-  background: var(--mist);
-}
-
-.brand-story__mark {
-  position: absolute;
-  top: 42px;
-  right: -80px;
-  width: 520px;
-  height: auto;
-  opacity: 0.055;
-  filter: grayscale(1);
-}
-
-.brand-story__inner {
-  position: relative;
+/* Hakkımızda — solda metin + özellik şeridi, sağda büyük kemerli fotoğraf
+   ile iki küçük fotoğrafın kolajı. Yalnızca bu bölüme özgü sınıflar;
+   genel renk/font/boşluk değişkenleri değişmedi. */
+.about {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 70px;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 56px;
+  align-items: center;
   padding-block: var(--section-pad);
 }
 
-.brand-story h2 {
-  max-width: 700px;
-  margin-bottom: 0;
+.about__text {
+  max-width: 660px;
 }
 
-.brand-story__copy {
-  max-width: 480px;
-  margin: 57px 0 0;
-}
-
-.values-grid {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0;
-  margin-top: 38px;
-  border-top: 1px solid var(--line);
-}
-
-.value-item {
-  padding: 27px 28px 20px 0;
-  border-right: 1px solid var(--line);
-}
-
-.value-item + .value-item {
-  padding-left: 28px;
-}
-
-.value-item:last-child {
-  border-right: 0;
-}
-
-.value-item span {
-  color: var(--magenta);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-}
-
-.value-item h3 {
-  margin: 38px 0 13px;
+.about__heading {
+  max-width: 660px;
+  margin: 18px 0 0;
   font-family: var(--font-display), Georgia, serif;
-  font-size: 27px;
+  /* Referanstaki üç zorunlu satır (Güzellik, / kendinizle kurduğunuz /
+     bağdır.) <br> ile korunur. Üst sınır, "kendinizle kurduğunuz" satırının
+     metin sütununa (yukarıdaki grid oranı) tek satırda sığacağı ölçüde
+     tutuldu; dar ekranlarda taşma değil, gerektiğinde ek doğal satır
+     kırılımı oluşur (clamp alt sınırı bunu güvenli tutar). */
+  font-size: clamp(34px, 4.3vw, 66px);
   font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
 }
 
-.value-item p {
-  max-width: 230px;
-  margin: 0;
+.about__heading span {
+  color: var(--magenta);
+}
+
+.about__copy {
+  max-width: 430px;
+  margin: 22px 0 0;
   color: var(--muted);
-  font-size: 12px;
-  line-height: 1.7;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.8;
+}
+
+.about__features {
+  display: flex;
+  margin: 34px 0 0;
+  padding: 0;
+  list-style: none;
+  width: fit-content;
+}
+
+.about__features li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+  padding: 0 26px;
+  border-left: 1px solid var(--line);
+  text-align: center;
+}
+
+.about__features li:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.about__features svg {
+  width: clamp(36px, 2.8vw, 42px);
+  height: clamp(36px, 2.8vw, 42px);
+  fill: none;
+  stroke: var(--turquoise-deep);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.about__features span {
+  font-size: clamp(14px, 1vw, 16px);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.about__visual {
+  --collage-gap: clamp(12px, 1.4vw, 18px);
+}
+
+.about__gallery {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.08fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--collage-gap);
+  aspect-ratio: 1.32;
+}
+
+.about__photo {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  background: var(--mist);
+  border: 1px solid var(--line);
+}
+
+.about__photo img {
+  object-fit: cover;
+}
+
+.about__photo--large {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  /* Kemer: üst iki köşenin yatay yarıçapı toplamı genişliğin tamamı olduğu
+     için üst kenar boyunca düz kısım kalmaz, tek sürekli bir kubbe oluşur.
+     Referanstaki daha yüksek/akıcı kemere yaklaşmak için dikey yarıçap
+     büyütüldü; odak noktası (bkz. page.tsx objectPosition) baş, yüz ve
+     uygulama noktasını kadraj içinde tutar. */
+  border-radius: 50% 50% 14px 14px / clamp(96px, 14vw, 168px) clamp(96px, 14vw, 168px) 14px 14px;
+}
+
+.about__stack {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--collage-gap);
+}
+
+.about__photo--small {
+  flex: 1;
+  border-radius: 18px;
+}
+
+.about__badge {
+  position: absolute;
+  top: 50%;
+  left: 53.5%;
+  display: grid;
+  width: clamp(78px, 8.4vw, 104px);
+  height: clamp(78px, 8.4vw, 104px);
+  border: 1px solid rgba(73, 190, 210, 0.55);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--turquoise-deep);
+  box-shadow: var(--shadow);
+  place-items: center;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.about__badge svg {
+  width: 64%;
+  height: 64%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.about__note {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 300;
 }
 
 .contact-band {
@@ -907,25 +995,19 @@ main {
     padding-top: 34px;
   }
 
-  .brand-story__inner {
+  .about {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 34px;
   }
 
-  .brand-story__copy {
-    margin-top: 0;
+  .about__text,
+  .about__visual {
+    max-width: none;
   }
 
-  .values-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .value-item:nth-child(2) {
-    border-right: 0;
-  }
-
-  .value-item:nth-child(n + 3) {
-    border-top: 1px solid var(--line);
+  .about__heading,
+  .about__copy {
+    max-width: 560px;
   }
 
   .contact-band {
@@ -1021,37 +1103,38 @@ main {
     row-gap: calc(var(--rozet) * 0.62);
   }
 
-  .brand-story h2,
   .contact-band h2 {
     font-size: clamp(44px, 13.5vw, 62px);
   }
 
-  .brand-story__mark {
-    top: 10px;
-    right: -190px;
+  .about__heading {
+    font-size: clamp(30px, 9vw, 40px);
   }
 
-  .values-grid {
-    grid-template-columns: 1fr;
+  .about__features {
+    width: 100%;
+    flex-wrap: wrap;
+    row-gap: 20px;
   }
 
-  .value-item,
-  .value-item + .value-item {
-    padding: 24px 0;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
+  .about__features li {
+    flex: 1 0 50%;
+    padding: 0 14px;
   }
 
-  .value-item:first-child {
-    border-top: 0;
+  .about__features li:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
   }
 
-  .value-item:last-child {
-    border-bottom: 0;
+  .about__features li:nth-child(n + 3) {
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
   }
 
-  .value-item h3 {
-    margin-top: 25px;
+  .about__badge {
+    width: 62px;
+    height: 62px;
   }
 
   .site-footer {
