@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { MobileMenu } from "@/components/mobile-menu";
 import { ServiceCarousel } from "@/components/service-carousel";
+import { ServiceTiles } from "@/components/service-tiles";
 
 const values = [
   ["01", "Dönüşüm", "Doğal güzelliğinizi görünür kılan kişisel uygulamalar."],
@@ -60,43 +61,20 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="hero-carousel" id="hizmetler">
+        <div className="hero-carousel">
           <ServiceCarousel />
         </div>
       </section>
 
-      <section className="service-story section-shell">
-        <div className="section-intro">
-          <p className="section-kicker">Size özel bakım ritüelleri</p>
-          <h2>Her dokunuş, size özel.</h2>
-          <p>
-            İhtiyacınızı dinleyen, yüzünüze ve bedeninize saygı duyan bir bakım
-            yaklaşımı. Esteelitta’da her hizmet kendi ritminizde başlar.
-          </p>
-          <a className="text-link" href="#hizmetler">
-            Tüm hizmetleri inceleyin
-          </a>
+      <section className="services section-shell" id="hizmetler">
+        <div className="services__intro">
+          <p className="section-kicker">Hizmetlerimiz</p>
+          <h2>
+            Işığınıza özel uygulamalar<span>.</span>
+          </h2>
         </div>
 
-        <div className="editorial-collage" aria-label="Esteelitta uygulama görselleri">
-          <figure className="collage-card collage-card--large">
-            <Image
-              src="/media/posters/02-cilt-bakimi.jpg"
-              alt="Profesyonel cilt bakımı uygulaması"
-              fill
-              sizes="(max-width: 700px) 78vw, 36vw"
-            />
-          </figure>
-          <figure className="collage-card collage-card--small">
-            <Image
-              src="/media/posters/05-sac-tasarimi.jpg"
-              alt="Profesyonel saç tasarımı"
-              fill
-              sizes="(max-width: 700px) 48vw, 20vw"
-            />
-          </figure>
-          <p className="collage-note">Kişisel. Özenli. Işıltılı.</p>
-        </div>
+        <ServiceTiles />
       </section>
 
       <section className="brand-story" id="hakkimizda">

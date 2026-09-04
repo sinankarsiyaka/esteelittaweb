@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 735" preserveAspectRatio="none">
+  <!-- Esteelitta hizmet kartı çerçeve silueti.
+       Ölçüm: sekiz kartın hizalanmış siluet birleşimi (bkz. globals.css,
+       .services__grid başlığındaki ölçüm notu).
+       Üst siluet TEK sürekli kubbedir: iki çeyrek elips tepede (u=0.61) ortak
+       yatay teğetle birleşir. Düz üst kenar ve çapraz kesim YOKTUR.
+       Her düğümde teğet süreklidir, dolayısıyla köşeli geçiş oluşmaz:
+         (0,422)    dikey  ← sol kenar ile kubbe
+         (610,0)    yatay  ← iki kubbe yayı
+         (1000,257) dikey  ← kubbe ile sağ kenar
+         (760,735)  yatay  ← sağ alt yay ile alt kenar
+         (120,735)  yatay  ← alt kenar ile sol alt yay
+         (0,615)    dikey  ← sol alt yay ile sol kenar -->
+  <path fill="#000" d="M0 422
+    A610 422 0 0 1 610 0
+    A390 257 0 0 1 1000 257
+    V588
+    A240 147 0 0 1 760 735
+    H120
+    A120 120 0 0 1 0 615
+    Z"/>
+</svg>
