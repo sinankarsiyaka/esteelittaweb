@@ -40,6 +40,11 @@ const aboutFeatures: { label: string; icon: React.ReactNode }[] = [
   },
 ];
 
+const contactAddress =
+  "Çınar Mahallesi, Bağdat Caddesi, Rahmet Apt. No: 195/12, Küçükyalı, Maltepe / İstanbul";
+const contactMapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contactAddress)}`;
+const contactInstagramHref = "https://www.instagram.com/esteelitta_kucukyali/";
+
 export default function Home() {
   return (
     <main>
@@ -178,19 +183,88 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="contact-band section-shell" id="iletisim">
-        <div>
-          <p className="section-kicker">Tanışmaya hazır mısınız?</p>
-          <h2>Işığınız için ilk adımı atın.</h2>
-        </div>
-        <div className="contact-actions">
-          <p>
-            Randevu, telefon ve konum bilgilerini işletme detayları netleştiğinde
-            birlikte tamamlayacağız.
+      <section className="contact section-shell" id="iletisim">
+        <div className="contact__text">
+          <p className="section-kicker">İletişim</p>
+          <h2 className="contact__heading">
+            Kendinize zaman
+            <br />
+            <span>ayırın.</span>
+          </h2>
+          <p className="contact__copy">
+            Randevu ve uygulamalar hakkında bilgi almak için bize Instagram’dan
+            ulaşın.
           </p>
-          <a className="button" href="#hizmetler">
-            Hizmetlere Dön
+
+          <div className="contact__divider" aria-hidden="true" />
+
+          <div className="contact__address">
+            <svg
+              className="contact__icon"
+              viewBox="0 0 32 32"
+              aria-hidden="true"
+            >
+              <path d="M16 4c-5 0-9 3.9-9 9.3 0 6.8 7.4 13.4 8.6 14.4a.7.7 0 0 0 .8 0c1.2-1 8.6-7.6 8.6-14.4C25 7.9 21 4 16 4Z" />
+              <circle cx="16" cy="13" r="3.4" />
+            </svg>
+            <div>
+              <h3>Küçükyalı’da buluşalım</h3>
+              <p>
+                Çınar Mahallesi, Bağdat Caddesi
+                <br />
+                Rahmet Apt. No: 195/12
+                <br />
+                Küçükyalı, Maltepe / İstanbul
+              </p>
+              <a
+                className="contact__map-link"
+                href={contactMapsHref}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Yol tarifi al ↗
+              </a>
+            </div>
+          </div>
+
+          <a
+            className="contact__instagram-row"
+            href={contactInstagramHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg
+              className="contact__icon"
+              viewBox="0 0 32 32"
+              aria-hidden="true"
+            >
+              <rect x="5" y="5" width="22" height="22" rx="6" />
+              <circle cx="16" cy="16" r="5.6" />
+              <path d="M22 10h.01" />
+            </svg>
+            <span>@esteelitta_kucukyali</span>
           </a>
+
+          <a
+            className="button contact__cta"
+            href={contactInstagramHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Instagram’dan ulaşın ↗
+          </a>
+        </div>
+
+        <div className="contact__visual">
+          <figure className="contact__photo">
+            <Image
+              src="/media/hakkimizda-gorseller-v1/02-resepsiyon-temsili.png"
+              alt=""
+              fill
+              sizes="(min-width: 920px) min(610px, calc((min(100vw - 48px, 1240px) - 64px) * 0.5192)), (min-width: 650px) min(760px, calc(100vw - 36px)), min(560px, calc(100vw - 28px))"
+            />
+            <figcaption className="contact__note">Temsili görsel</figcaption>
+          </figure>
         </div>
       </section>
 
