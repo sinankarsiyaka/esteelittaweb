@@ -76,6 +76,16 @@ function clamp01(value: number) {
   return Math.min(Math.max(value, 0), 1);
 }
 
+/**
+ * video[poster] ham dosyayı indirir; next/image devreye girmez. Yüksek
+ * çözünürlüklü kaynaklarla bu, hero'da kart başına ~2 MB demek. Poster
+ * optimizer üzerinden istenerek kart boyutuna uygun sürüm alınır.
+ * Kart geometrisi ve oynatma davranışı etkilenmez.
+ */
+function posterUrl(src: string) {
+  return `/_next/image?url=${encodeURIComponent(src)}&w=640&q=75`;
+}
+
 function getControlGap(viewportHeight: number) {
   return (
     CONTROL_GAP_MIN + clamp01((viewportHeight - 700) / 144) * CONTROL_GAP_RANGE
@@ -246,7 +256,7 @@ function ServiceCard({
         ref={videoRef}
         className="service-card__media"
         src={service.video}
-        poster={service.poster}
+        poster={posterUrl(service.poster)}
         style={{ objectPosition: service.focalPoint }}
         preload={index < 4 ? "metadata" : "none"}
         muted
@@ -402,7 +412,7 @@ export function ServiceCarousel() {
         aria-label="Hizmet carousel kontrolleri"
       >
         <button
-          className="carousel-arrow"
+          className="carousel-arrow carousel-pause"
           type="button"
           onClick={() => setAutoplay(!playing)}
           aria-label={playing ? "Videoları duraklat" : "Videoları oynat"}
@@ -419,24 +429,27 @@ export function ServiceCarousel() {
           )}
         </button>
         <button
-          className="carousel-arrow"
+          className="carousel-arrow carousel-direction"
           type="button"
           onClick={() => move(1)}
           aria-label="Önceki hizmet"
         >
-          ←
+          <svg viewBox="0 0 64 24" aria-hidden="true"><path d="M60 12H4m7-7-7 7 7 7" /></svg>
         </button>
         <p className="drag-cue">
-          <span>Basılı tutup sürükle</span>
-          <i aria-hidden="true" />
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M12 17V7a2 2 0 0 1 4 0v8-3a2 2 0 0 1 4 0v4-2a2 2 0 0 1 4 0v3-1a2 2 0 0 1 4 0v6c0 5-3 8-8 8h-1c-3 0-5-1.5-7-4l-5-6a2 2 0 0 1 3-3l3 3" />
+            <path d="M8 4H3m0 0 2-2M3 4l2 2M22 4h5m0 0-2-2m2 2-2 2" />
+          </svg>
+          <span>Keşfetmek için sürükleyin</span>
         </p>
         <button
-          className="carousel-arrow"
+          className="carousel-arrow carousel-direction"
           type="button"
           onClick={() => move(-1)}
           aria-label="Sonraki hizmet"
         >
-          →
+          <svg viewBox="0 0 64 24" aria-hidden="true"><path d="M4 12h56m-7-7 7 7-7 7" /></svg>
         </button>
       </div>
     </div>

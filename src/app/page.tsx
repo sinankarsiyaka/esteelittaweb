@@ -104,7 +104,7 @@ export default function Home() {
         <div className="services__intro">
           <p className="section-kicker">Hizmetlerimiz</p>
           <h2>
-            Işığınıza özel uygulamalar<span>.</span>
+            Bakımın en <span>zarif</span> hali.
           </h2>
         </div>
 
@@ -172,9 +172,9 @@ export default function Home() {
 
             <span className="about__badge" aria-hidden="true">
               <svg viewBox="0 0 32 32">
-                <path d="M12.6 5.4c2.1.3 3.9 1.7 4.9 3.6.7-.2 1.4.3 1.3 1-.1.6-.6 1-1.2 1 .3.9.2 1.9-.3 2.7.6.3 1 .9.9 1.6-.1.6-.6 1-1.2 1.1-.5 1.6-1.6 3-3.1 3.7v4.4" />
-                <path d="M12.6 5.4c-4 .9-6.9 4.4-6.9 8.6 0 3.9 2.3 7.1 5.6 8.6" />
-                <path d="M15.9 9.6h.01" />
+                <path d="M19.5 3.5c-5 1.1-8.5 5.1-8.5 10.2 0 3.7 1.8 6.8 4.7 8.7v5.9" />
+                <path d="M19.5 3.5c-.6 2.4-.2 4.6 1.3 6.4l-1.2 2.2 2 .8c-.1 2.8-1.5 5.1-4.1 6.5" />
+                <path d="M17.7 8.8c-3.4 1.4-5.6 4.6-5.6 8.3 0 2.9 1.4 5.5 3.7 7" opacity=".45" />
               </svg>
             </span>
           </div>
@@ -268,15 +268,53 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="site-footer section-shell">
-        <Image
-          src="/brand/esteelitta-logo.png"
-          alt="Esteelitta"
-          width={202}
-          height={137}
-        />
-        <p>Profesyonel güzellik ve estetik deneyimi.</p>
-        <a href="#anasayfa">Yukarı dön ↑</a>
+      <footer className="site-footer">
+        <div className="section-shell footer__inner">
+          <div className="footer__top">
+            <div className="footer__identity">
+              <a className="footer__brand" href="#anasayfa" aria-label="Esteelitta ana sayfa">
+                <Image
+                  src="/brand/esteelitta-logo.png"
+                  alt="Esteelitta"
+                  width={1841}
+                  height={1247}
+                  sizes="(min-width: 650px) 250px, 196px"
+                />
+              </a>
+              <p className="footer__tagline">
+                Güzelliğe sakin, güvenli ve kişisel bir dokunuş.
+              </p>
+            </div>
+
+            <nav className="footer__nav" aria-label="Alt menü">
+              <a href="#hizmetler">Hizmetler</a>
+              <a href="#hakkimizda">Hakkımızda</a>
+              <a href="#iletisim">İletişim</a>
+              <a
+                className="footer__instagram"
+                href={contactInstagramHref}
+                aria-label="Esteelitta Instagram hesabı (yeni sekmede açılır)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg viewBox="0 0 32 32" aria-hidden="true">
+                  <rect x="5" y="5" width="22" height="22" rx="6" />
+                  <circle cx="16" cy="16" r="5.6" />
+                  <path d="M22 10h.01" />
+                </svg>
+              </a>
+            </nav>
+          </div>
+
+          <div className="footer__bottom">
+            <p>
+              © {new Date().getFullYear()} Esteelitta. Tüm hakları saklıdır.
+            </p>
+            <a href="#anasayfa">
+              Yukarı dön <span aria-hidden="true">↑</span>
+            </a>
+          </div>
+        </div>
       </footer>
     </main>
   );
