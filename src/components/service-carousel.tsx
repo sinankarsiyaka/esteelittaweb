@@ -77,14 +77,27 @@ function clamp01(value: number) {
 }
 
 /**
- * video[poster] ham dosyayı indirir; next/image devreye girmez. Yüksek
- * çözünürlüklü kaynaklarla bu, hero'da kart başına ~2 MB demek. Poster
- * optimizer üzerinden istenerek kart boyutuna uygun sürüm alınır.
- * Kart geometrisi ve oynatma davranışı etkilenmez.
+ * Kart posteri /_next/image üzerinden anlık üretilmiyor: ilk istekte
+ * optimizer'ın kaynağı (1.7-2.6 MB) o an sıkıştırması iOS Safari'de kartın
+ * 130-200ms boş görünmesine yol açıyordu. Bunun yerine build zamanında
+ * hazırlanmış, 720px genişliğinde statik WebP dosyaları kullanılır
+ * (bkz. public/media/posters/carousel/). Kart geometrisi değişmez.
  */
-function posterUrl(src: string) {
-  return `/_next/image?url=${encodeURIComponent(src)}&w=640&q=75`;
+function carouselPosterUrl(src: string) {
+  const stem = src.split("/").pop()!.replace(/\.[^.]+$/, "");
+  return `/media/posters/carousel/${stem}.webp`;
 }
+
+type DragState = {
+  active: boolean;
+  pointerId: number | null;
+  lastX: number;
+  lastTime: number;
+  velocity: number;
+  // Bırakma sonrası yerleşme (spring) animasyonu sürüyor mu. Yeni merkez
+  // kartın videosu yalnızca sürükleme bitip bu da false olduğunda başlar.
+  settling: boolean;
+};
 
 function getControlGap(viewportHeight: number) {
   return (
@@ -148,6 +161,21 @@ function cardAngle(rotation: number, index: number, offset: number) {
   return normalizeAngle(rotation + index * SLOT_ANGLE + offset);
 }
 
+/**
+ * Merkezdeki kart ile onun iki komşusunun index'lerini döndürür. Yalnızca
+ * carousel boştayken (ilk hazır oluşta ve yerleşme tamamlandığında)
+ * çağrılır — sürükleme sırasında hiçbir zaman değil — böylece video
+ * ön-hazırlığı sürekli genişleyen bir küme yerine sabit, küçük bir kümede
+ * kalır (bkz. ServiceCarousel'deki refreshWarmIndices).
+ */
+function nearIndices(rotation: number, offset: number, total: number) {
+  const raw = Math.round(-(rotation + offset) / SLOT_ANGLE);
+  const center = ((raw % total) + total) % total;
+  const prev = (center - 1 + total) % total;
+  const next = (center + 1) % total;
+  return [prev, center, next];
+}
+
 function getTransform(angle: number, layout: CarouselLayout) {
   const radians = (angle * Math.PI) / 180;
   const distance = Math.abs(angle) / SLOT_ANGLE;
@@ -184,14 +212,20 @@ function ServiceCard({
   service,
   index,
   rotation,
+  interactionTick,
   layout,
   playing,
+  warm,
+  dragState,
 }: {
   service: Service;
   index: number;
   rotation: MotionValue<number>;
+  interactionTick: MotionValue<number>;
   layout: CarouselLayout;
   playing: boolean;
+  warm: boolean;
+  dragState: React.RefObject<DragState>;
 }) {
   const cardRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -201,24 +235,82 @@ function ServiceCard({
   const opacity = useTransform(rotation, (value) =>
     getOpacity(cardAngle(value, index, layout.offset), layout.mode),
   );
-  // Merkez kart en üstte, uzaklaştıkça arkaya doğru sıralanır.
-  const zIndex = useTransform(rotation, (value) =>
-    Math.round(200 - Math.abs(cardAngle(value, index, layout.offset)) * 2),
-  );
+  // Merkez kart en üstte, uzaklaştıkça arkaya doğru sıralanır. Değer,
+  // sürekli açıya değil "kaç yuva uzakta" olduğuna bağlıdır; böylece
+  // z-index yalnızca sıralama gerçekten değiştiğinde yeni bir değer alır.
+  const zIndex = useTransform(rotation, (value) => {
+    const angle = cardAngle(value, index, layout.offset);
+    const slot = Math.min(Math.round(Math.abs(angle) / SLOT_ANGLE), 4);
+    return 200 - slot * 10;
+  });
+
+  // Medya kaynağının yaşam döngüsü. <video> öğesi `warm` değiştiğinde
+  // key üzerinden baştan kurulur: eski öğe DOM'dan çıkar (arabelleği ve
+  // dinleyicileriyle birlikte), yeni öğede data-revealed bulunmadığı için
+  // poster aynı render'da yeniden görünür olur — efektin çalışmasını
+  // beklemeye gerek kalmaz. Bu efekt yalnızca `warm` değiştiğinde çalışır;
+  // `warm` de yalnızca ilk viewport ölçümünde ve yerleşme tamamlandığında
+  // değişir, yani sürükleme sırasında hiçbir kaynak eklenmez/kaldırılmaz.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    let revealed = false;
+    const reveal = () => {
+      // Videoyu yalnızca kart hâlâ warm iken ve gerçekten bu öğeye bağlı
+      // güncel kaynağın ilk karesi hazırken görünür yap. Eski bir kaynağın
+      // geç gelen olayı yeni posteri gizleyemez.
+      if (revealed || !warm || !video.currentSrc || video.readyState < 2) return;
+      revealed = true;
+      video.dataset.revealed = "true";
+    };
+
+    if (warm) {
+      video.addEventListener("loadeddata", reveal);
+      video.addEventListener("playing", reveal);
+
+      type VideoWithFrameCallback = HTMLVideoElement & {
+        requestVideoFrameCallback?: (callback: () => void) => number;
+      };
+      (video as VideoWithFrameCallback).requestVideoFrameCallback?.(reveal);
+
+      reveal();
+    }
+
+    return () => {
+      video.removeEventListener("loadeddata", reveal);
+      video.removeEventListener("playing", reveal);
+      // Ayrılan öğeyi gerçekten boşalt: önce kaynağı kaldır, sonra load().
+      // Kaynak dururken load() çağırmak yeniden indirmeye yol açardı;
+      // kaynaksız load() ise readyState'i 0'a düşürür ve arabelleği bırakır.
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    };
+  }, [warm]);
 
   useEffect(() => {
+    // Bu kapanıştaki son-uygulanan durumlar: rotasyon her karede değişse
+    // de aria-hidden/play/pause komutları yalnızca gerçekten değiştiğinde
+    // DOM'a/medyaya yazılır.
+    let lastHidden: boolean | undefined;
+    let lastPlaying: boolean | undefined;
+    // Her play/pause yön değişiminde artar (yalnızca play'de değil). Geç
+    // gelen bir play() isteği çözüldüğünde bu değer ilerlemişse, aradan
+    // başka bir karar geçmiş demektir.
+    let requestId = 0;
+
     const update = (value: number) => {
       const angle = cardAngle(value, index, layout.offset);
+      const absAngle = Math.abs(angle);
 
-      // Tamamen sönmüş kartlar ekran okuyucuya da kapatılır. Rotasyon her
-      // karede değiştiği için durum React state'i yerine doğrudan DOM'a
-      // yazılır; aksi halde her kare sekiz kartı yeniden render ederdi.
       const card = cardRef.current;
       if (card) {
-        if (getOpacity(angle, layout.mode) === 0) {
-          card.setAttribute("aria-hidden", "true");
-        } else {
-          card.removeAttribute("aria-hidden");
+        const hidden = getOpacity(angle, layout.mode) === 0;
+        if (hidden !== lastHidden) {
+          lastHidden = hidden;
+          if (hidden) card.setAttribute("aria-hidden", "true");
+          else card.removeAttribute("aria-hidden");
         }
       }
 
@@ -226,18 +318,62 @@ function ServiceCard({
       if (!video) return;
 
       const visibleLimit = layout.mode === "center" ? 58 : 24;
-      const shouldPlay = playing && Math.abs(angle) <= visibleLimit;
+      // Mobilde sürükleme veya yerleşme animasyonu sürerken aynı anda en
+      // fazla bir video (zaten oynayan) aktif kalır; gelen kart videosu
+      // yalnızca parmak kalkıp yerleşme bittikten sonra başlar.
+      const suspendedByDrag =
+        layout.mode === "phone" &&
+        (dragState.current.active || dragState.current.settling);
+      const shouldPlay = playing && !suspendedByDrag && absAngle <= visibleLimit;
+
+      if (shouldPlay === lastPlaying) return;
+      lastPlaying = shouldPlay;
+      const id = ++requestId;
 
       if (shouldPlay) {
-        void video.play().catch(() => undefined);
+        video
+          .play()
+          .then(() => {
+            // Safari'de play() isteği beklerken araya giren bir pause()
+            // her zaman gerçek oynatmayı engellemez: veri hazır olduğunda
+            // video, aradaki pause() çağrısına rağmen başlayabilir. Bu
+            // yüzden token eşleşse de eşleşmese de, isteğin sonunda kartın
+            // GÜNCEL durumuna göre gerçekten oynaması gerekip gerekmediği
+            // yeniden hesaplanır; mobilde sürükleme veya yerleşme hâlâ
+            // sürüyorsa video mutlaka duraklatılır.
+            const liveAngle = Math.abs(cardAngle(rotation.get(), index, layout.offset));
+            const liveSuspended =
+              layout.mode === "phone" &&
+              (dragState.current.active || dragState.current.settling);
+            const stillShouldPlay =
+              playing && !liveSuspended && liveAngle <= visibleLimit;
+
+            if (!stillShouldPlay) {
+              if (id === requestId) lastPlaying = false;
+              video.pause();
+            }
+          })
+          .catch(() => undefined);
       } else {
         video.pause();
       }
     };
 
     update(rotation.get());
-    return rotation.on("change", update);
-  }, [index, layout.mode, layout.offset, playing, rotation]);
+    const unsubscribeRotation = rotation.on("change", update);
+    // interactionTick yalnızca sürükleme/yerleşme durumu, rotasyonun kendisi
+    // değişmeden değiştiğinde (bkz. bumpInteractionTick) bir kez artar; bu
+    // durumlarda da aynı update() en güncel rotasyon değeriyle çalıştırılır.
+    const unsubscribeTick = interactionTick.on("change", () => update(rotation.get()));
+
+    return () => {
+      unsubscribeRotation();
+      unsubscribeTick();
+    };
+    // `warm` bağımlılıkta: kart yeniden ısındığında <video> öğesi baştan
+    // kurulduğu için oynatma kararı yeni öğe üzerinde tekrar verilmelidir
+    // (ör. çok yuvalık bir atlayıştan sonra merkeze gelen soğuk kart).
+  }, [index, layout.mode, layout.offset, playing, warm, rotation, interactionTick, dragState]);
 
   return (
     <motion.article
@@ -252,17 +388,30 @@ function ServiceCard({
         zIndex,
       }}
     >
+      {/* Kaynak yalnızca warm kartlarda bağlıdır; cool kartta src hiç
+          render edilmez, böylece öğe gerçekten boş kalır (readyState 0).
+          key, warm/cool geçişinde öğeyi baştan kurar. */}
       <video
+        key={warm ? "media-warm" : "media-cool"}
         ref={videoRef}
         className="service-card__media"
-        src={service.video}
-        poster={posterUrl(service.poster)}
+        src={warm ? service.video : undefined}
         style={{ objectPosition: service.focalPoint }}
-        preload={index < 4 ? "metadata" : "none"}
+        preload={warm ? "auto" : "none"}
         muted
         loop
         playsInline
         disablePictureInPicture
+      />
+      {/* Poster her kartta koşulsuz render edilir ve hiçbir zaman
+          imperative olarak gizlenmez; yalnızca üstündeki video kendi
+          güncel kaynağının ilk karesini sunduğunda CSS ile kalkar. */}
+      <img
+        className="service-card__poster"
+        src={carouselPosterUrl(service.poster)}
+        alt=""
+        aria-hidden="true"
+        style={{ objectPosition: service.focalPoint }}
       />
       <div className="service-card__shade" />
       <p className="service-card__title">{service.name}</p>
@@ -283,38 +432,93 @@ export function ServiceCarousel() {
   // aksi hâlde hidrasyon uyuşmazlığı oluşur (React #418).
   const playing = ready ? autoplay ?? reducedMotion === false : false;
   const rotation = useMotionValue(0);
-  const dragState = useRef({
+  // rotation yalnızca değeri gerçekten değiştiğinde "change" yayınlar.
+  // Sürükleme/yerleşme durumu (dragState) rotasyonun kendisi değişmeden de
+  // değişebildiği için (ör. yerleşme tam hedefte biterken veya parmak
+  // kıpırdamadan indiğinde), kartların oynatma efektini bu durumlarda
+  // yeniden tetiklemek için ayrı, her seferinde gerçekten artan bir sinyal
+  // kullanılır.
+  const interactionTick = useMotionValue(0);
+  const bumpInteractionTick = () => interactionTick.set(interactionTick.get() + 1);
+  const dragState = useRef<DragState>({
     active: false,
+    pointerId: null,
     lastX: 0,
     lastTime: 0,
     velocity: 0,
+    settling: false,
   });
+  // settle() üst üste çağrılırsa (ör. sürükleme bitmeden ok tuşuna
+  // basılırsa) yalnızca en güncel çağrının tamamlanma bildirimi geçerli
+  // sayılır; eski bir animasyonun geç gelen "bitti" sinyali settling
+  // bayrağını yanlışlıkla erken kapatmaz.
+  const settleGeneration = useRef(0);
   const layout = getLayout(viewport.width, viewport.height);
+  // Ön hazırlığı yalnızca merkez + iki komşuyla sınırlı tutar. Bu küme
+  // animasyonun her karesinde değil, yalnızca ilk hazır oluşta (aşağıdaki
+  // viewport efekti) ve her yerleşme tamamlandığında (refreshWarmIndices)
+  // yeniden hesaplanır.
+  const [warmIndices, setWarmIndices] = useState<number[]>([]);
 
   useEffect(() => {
     const update = () => {
-      setViewport({ width: window.innerWidth, height: window.innerHeight });
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      setViewport({ width, height });
       setReady(true);
+      // `ready`'e tepki veren ayrı bir efekt yerine gerçek viewport'u
+      // doğrudan burada, window'dan okuyarak hesaplanır — bu, React
+      // state'ini başka bir state'ten yansıtan bir efekt değil, dış
+      // sistemi (pencere boyutu) React'e senkronize eden tek bir efekttir.
+      setWarmIndices(nearIndices(rotation.get(), getLayout(width, height).offset, services.length));
     };
 
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
-  }, []);
+  }, [rotation]);
+
+  function refreshWarmIndices() {
+    setWarmIndices(nearIndices(rotation.get(), layout.offset, services.length));
+  }
 
   function settle(target: number, velocity = 0) {
     const snapped = Math.round(target / SLOT_ANGLE) * SLOT_ANGLE;
+    const generation = ++settleGeneration.current;
 
     if (reducedMotion) {
       rotation.set(snapped);
+      dragState.current.settling = false;
+      // Hedef zaten mevcut değere eşitse (ör. kart hareket ettirilmeden
+      // bırakıldıysa) rotation.set() "change" yayınlamaz, dolayısıyla
+      // kartların play/pause efekti kendiliğinden tetiklenmez. Aynı fonksiyon
+      // pointer cancel tarafından da çağrıldığı için bu düzeltme onu da kapsar.
+      bumpInteractionTick();
+      // Carousel yeniden boşta: ön hazırlık kümesi burada, animasyon
+      // sırasında değil, yeniden hesaplanır.
+      refreshWarmIndices();
       return;
     }
 
-    animate(rotation, snapped, {
+    dragState.current.settling = true;
+    const controls = animate(rotation, snapped, {
       type: "spring",
       duration: 0.5,
       bounce: 0.2,
       velocity,
+    });
+
+    void controls.then(() => {
+      if (settleGeneration.current === generation) {
+        dragState.current.settling = false;
+        // Yerleşme bittiğinde rotasyonun kendisi artık değişmiyor, bu yüzden
+        // kartların play/pause efekti bir daha tetiklenmez; yeni merkez
+        // kartın videosu tam bu anda, yerleşme bittikten hemen sonra başlar.
+        bumpInteractionTick();
+        // Carousel yeniden boşta: ön hazırlık kümesi burada, animasyon
+        // sırasında değil, yeniden hesaplanır.
+        refreshWarmIndices();
+      }
     });
   }
 
@@ -323,17 +527,33 @@ export function ServiceCarousel() {
   }
 
   function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    // İkinci bir parmak veya eski bir pointer olayı, devam eden sürüklemeyi
+    // bozmasın diye yalnızca aktif pointer yokken yeni bir sürükleme başlar.
+    if (dragState.current.active && event.pointerId !== dragState.current.pointerId) {
+      return;
+    }
+
+    // Yeni geçerli dokunuş, sürmekte olan yerleşme animasyonunu olduğu
+    // konumda durdurur; kontrol gecikmeden parmağa geçer.
+    rotation.stop();
     event.currentTarget.setPointerCapture(event.pointerId);
     dragState.current = {
       active: true,
+      pointerId: event.pointerId,
       lastX: event.clientX,
       lastTime: performance.now(),
       velocity: 0,
+      settling: false,
     };
+    // Parmak henüz kıpırdamamış olsa bile oynayan videoyu hemen duraklat;
+    // rotation değişmediği sürece kartların efekti kendiliğinden tetiklenmez.
+    bumpInteractionTick();
   }
 
   function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
-    if (!dragState.current.active) return;
+    if (!dragState.current.active || event.pointerId !== dragState.current.pointerId) {
+      return;
+    }
 
     const now = performance.now();
     const deltaX = event.clientX - dragState.current.lastX;
@@ -346,7 +566,9 @@ export function ServiceCarousel() {
   }
 
   function handlePointerEnd(event: React.PointerEvent<HTMLDivElement>) {
-    if (!dragState.current.active) return;
+    if (!dragState.current.active || event.pointerId !== dragState.current.pointerId) {
+      return;
+    }
 
     dragState.current.active = false;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
@@ -360,8 +582,10 @@ export function ServiceCarousel() {
     settle(projected, dragState.current.velocity * sensitivity);
   }
 
-  function handlePointerCancel() {
-    if (!dragState.current.active) return;
+  function handlePointerCancel(event: React.PointerEvent<HTMLDivElement>) {
+    if (!dragState.current.active || event.pointerId !== dragState.current.pointerId) {
+      return;
+    }
     dragState.current.active = false;
     settle(rotation.get());
   }
@@ -400,8 +624,11 @@ export function ServiceCarousel() {
             service={service}
             index={index}
             rotation={rotation}
+            interactionTick={interactionTick}
             layout={layout}
             playing={playing}
+            warm={warmIndices.includes(index)}
+            dragState={dragState}
           />
         ))}
       </motion.div>

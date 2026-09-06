@@ -411,11 +411,15 @@ main {
   will-change: transform, opacity;
 }
 
-/* Işık videonun arkasında kalmaz: çerçeve yüzeyin üzerinde, dokunmayı engellemez. */
+/* Işık videonun arkasında kalmaz: çerçeve yüzeyin üzerinde, dokunmayı engellemez.
+   Katman sırası (poster 0 < video 1 < gradyan 2 < başlık 3 < çerçeve 4)
+   açıkça sabitlenir; aksi halde pozitif z-index'li medya katmanları,
+   z-index:auto olan gradyan/başlığın önüne geçer (DOM sırası bunu
+   garanti etmez). */
 .service-card::after {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 4;
   border: 1px solid rgba(255, 255, 255, 0.78);
   border-radius: inherit;
   box-shadow: inset 2px 2px 2px rgba(255, 255, 255, 0.7),
@@ -426,6 +430,7 @@ main {
 }
 
 .service-card__media,
+.service-card__poster,
 .service-card__shade {
   position: absolute;
   inset: 0;
@@ -433,12 +438,39 @@ main {
   height: 100%;
 }
 
-.service-card__media {
+/* Poster her zaman görünür taban katmandır; video yalnızca kendi güncel
+   kaynağının gerçek ilk karesini sunduğunda (data-revealed) üstünde
+   belirir. Öğe warm/cool geçişinde baştan kurulduğu için data-revealed
+   kendiliğinden sıfırlanır ve poster aynı render'da geri gelir. */
+.service-card__poster {
+  z-index: 0;
   object-fit: cover;
   pointer-events: none;
 }
 
+.service-card__media {
+  z-index: 1;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.service-card__media[data-revealed="true"] {
+  opacity: 1;
+}
+
+/* Poster yalnızca video tam olarak opak hale geldikten sonra kalkar;
+   geçiş boyunca iki katman birden yarı saydam kalmadığı için kart zemini
+   hiçbir karede sızmaz. Geri dönüşte (data-revealed kalktığında) geçiş
+   kuralı da kalkar, yani poster anında görünür olur. */
+.service-card__media[data-revealed="true"] + .service-card__poster {
+  opacity: 0;
+  transition: opacity 0s linear 160ms;
+}
+
 .service-card__shade {
+  z-index: 2;
   background:
     linear-gradient(180deg, rgba(12, 52, 59, 0.12) 0%, transparent 24%),
     linear-gradient(180deg, transparent 54%, rgba(7, 36, 43, 0.82) 100%);
@@ -446,6 +478,7 @@ main {
 
 .service-card__title {
   position: absolute;
+  z-index: 3;
   right: 18px;
   bottom: 17px;
   left: 18px;
