@@ -2,13 +2,16 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
-const links = [
-  ["#hakkimizda", "Hakkımızda"],
-  ["#hizmetler", "Hizmetler"],
-  ["#iletisim", "İletişim"],
-] as const;
+import { SiteLink } from "@/components/site-link";
+import type { NavId, NavItem } from "@/components/site-navigation";
 
-export function MobileMenu() {
+type Props = {
+  links: NavItem[];
+  appointmentHref: string;
+  active?: NavId;
+};
+
+export function MobileMenu({ links, appointmentHref, active }: Props) {
   const [open, setOpen] = useState(false);
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -62,15 +65,24 @@ export function MobileMenu() {
       {/* Panel akıştan çıkarılmıştır: açılması arkadaki sayfayı kaydırmaz. */}
       <div className="mobile-menu__panel" id={panelId} hidden={!open}>
         <nav aria-label="Mobil menü">
-          {links.map(([href, label]) => (
-            <a key={href} href={href} onClick={() => setOpen(false)}>
-              {label}
-            </a>
+          {links.map((link) => (
+            <SiteLink
+              key={link.id}
+              href={link.href}
+              aria-current={link.id === active ? "page" : undefined}
+              onClick={() => setOpen(false)}
+            >
+              {link.label}
+            </SiteLink>
           ))}
         </nav>
-        <a className="button" href="#iletisim" onClick={() => setOpen(false)}>
+        <SiteLink
+          className="button"
+          href={appointmentHref}
+          onClick={() => setOpen(false)}
+        >
           Randevu Al
-        </a>
+        </SiteLink>
       </div>
     </div>
   );

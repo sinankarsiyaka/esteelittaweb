@@ -24,7 +24,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="tr">
+    /* data-scroll-behavior: sayfa içi çıpalarda yumuşak kaydırma korunur,
+       ancak sayfalar arası geçişte Next.js anlık başa dönüşü uygular. */
+    <html lang="tr" data-scroll-behavior="smooth">
       <body className={`${display.variable} ${sans.variable}`}>{children}</body>
     </html>
   );

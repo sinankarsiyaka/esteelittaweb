@@ -1,8 +1,10 @@
 import Image from "next/image";
 
-import { MobileMenu } from "@/components/mobile-menu";
 import { ServiceCarousel } from "@/components/service-carousel";
 import { ServiceTiles } from "@/components/service-tiles";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
+import { instagramHref, mapsHref } from "@/data/site";
 
 const aboutFeatures: { label: string; icon: React.ReactNode }[] = [
   {
@@ -40,11 +42,6 @@ const aboutFeatures: { label: string; icon: React.ReactNode }[] = [
   },
 ];
 
-const contactAddress =
-  "Çınar Mahallesi, Bağdat Caddesi, Rahmet Apt. No: 195/12, Küçükyalı, Maltepe / İstanbul";
-const contactMapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contactAddress)}`;
-const contactInstagramHref = "https://www.instagram.com/esteelitta_kucukyali/";
-
 export default function Home() {
   return (
     <main>
@@ -52,30 +49,7 @@ export default function Home() {
         <div className="hero-wash hero-wash--left" aria-hidden="true" />
         <div className="hero-wash hero-wash--right" aria-hidden="true" />
 
-        <header className="site-header">
-          <a className="brand" href="#anasayfa" aria-label="Esteelitta ana sayfa">
-            <Image
-              src="/brand/esteelitta-logo.png"
-              alt="Esteelitta"
-              width={1841}
-              height={1247}
-              sizes="(max-width: 649px) 145px, (max-width: 919px) 162px, 184px"
-              priority
-            />
-          </a>
-
-          <nav className="desktop-nav" aria-label="Ana menü">
-            <a href="#hakkimizda">Hakkımızda</a>
-            <a href="#hizmetler">Hizmetler</a>
-            <a href="#iletisim">İletişim</a>
-          </nav>
-
-          <a className="button button--compact" href="#iletisim">
-            Randevu Al
-          </a>
-
-          <MobileMenu />
-        </header>
+        <SiteHeader context="home" />
 
         <div className="hero-copy">
           <p className="eyebrow">Profesyonel Güzellik &amp; Estetik</p>
@@ -218,7 +192,7 @@ export default function Home() {
               </p>
               <a
                 className="contact__map-link"
-                href={contactMapsHref}
+                href={mapsHref}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -230,7 +204,7 @@ export default function Home() {
           <div className="contact__social">
             <a
               className="contact__social-icon"
-              href={contactInstagramHref}
+              href={instagramHref}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Esteelitta Instagram hesabı (yeni sekmede açılır)"
@@ -248,7 +222,7 @@ export default function Home() {
 
             <a
               className="button contact__cta"
-              href={contactInstagramHref}
+              href={instagramHref}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -270,54 +244,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="site-footer">
-        <div className="section-shell footer__inner">
-          <div className="footer__top">
-            <div className="footer__identity">
-              <a className="footer__brand" href="#anasayfa" aria-label="Esteelitta ana sayfa">
-                <Image
-                  src="/brand/esteelitta-logo.png"
-                  alt="Esteelitta"
-                  width={1841}
-                  height={1247}
-                  sizes="(min-width: 650px) 250px, 196px"
-                />
-              </a>
-              <p className="footer__tagline">
-                Güzelliğe sakin, güvenli ve kişisel bir dokunuş.
-              </p>
-            </div>
-
-            <nav className="footer__nav" aria-label="Alt menü">
-              <a href="#hizmetler">Hizmetler</a>
-              <a href="#hakkimizda">Hakkımızda</a>
-              <a href="#iletisim">İletişim</a>
-              <a
-                className="footer__instagram"
-                href={contactInstagramHref}
-                aria-label="Esteelitta Instagram hesabı (yeni sekmede açılır)"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <svg viewBox="0 0 32 32" aria-hidden="true">
-                  <rect x="5" y="5" width="22" height="22" rx="6" />
-                  <circle cx="16" cy="16" r="5.6" />
-                  <path d="M22 10h.01" />
-                </svg>
-              </a>
-            </nav>
-          </div>
-
-          <div className="footer__bottom">
-            <p>
-              © {new Date().getFullYear()} Esteelitta. Tüm hakları saklıdır.
-            </p>
-            <a href="#anasayfa">
-              Yukarı dön <span aria-hidden="true">↑</span>
-            </a>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter context="home" topHref="#anasayfa" />
     </main>
   );
 }
