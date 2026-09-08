@@ -2969,3 +2969,680 @@ main {
     transform: none;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   /iletisim — iletişim sayfası
+
+   Renkler onaylanan tasarımdan piksel ölçümüyle alındı: porselen zemin
+   #FCFBFD, iletişim bölümü #EEFAFB, kartlar beyaz, turkuaz #4BB0C6,
+   fuşya #CF1B7D, mürekkep #123F48. Sayfa marka paletinin dışına çıkmaz.
+
+   Ölçüler 1440px referansından alınmıştır: kart 407×554, kart içi boşluk
+   22px, görsel oranı 377/390, şerit satırı 142px, satır arası 28px.
+
+   Hareket kuralları globals.css'in sonundaki azaltılmış hareket bloğunda
+   toplanır; buradaki hiçbir animasyon transform ve opacity dışına çıkmaz.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.iletisim-main {
+  /* Şeritler yatayda taşar, bu yüzden yatay eksen kırpılır. Dikey eksen
+     görünür bırakılır; aksi hâlde sticky header çalışmaz. */
+  overflow: clip visible;
+
+  --il-turquoise: #4bb0c6;
+  --il-magenta: #cf1b7d;
+  --il-ink: #123f48;
+  --il-contact-bg: #eefafb;
+  --il-page-bg: #fcfbfd;
+  --il-muted: #5b767d;
+  --il-hairline: rgba(75, 176, 198, 0.22);
+  --il-card-shadow: 0 26px 60px -32px rgba(18, 63, 72, 0.22);
+  /* Referanstaki bölüm ritmi: 1440px'te ~118px, 390px'te ~56px. */
+  --il-section-pad: clamp(56px, 8.2vw, 118px);
+  --il-ease: cubic-bezier(0.44, 0, 0.56, 1);
+
+  background: var(--il-page-bg);
+}
+
+.visually-hidden {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── Sticky header ───────────────────────────────────────────────────
+   Yalnızca bu sayfa header'ı yapışkan yapar; ana sayfa ve /hizmetler
+   SiteHeader'ı doğrudan, akış içinde kullanmaya devam eder. */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: var(--il-page-bg);
+}
+
+.sticky-header .site-header {
+  min-height: 88px;
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────── */
+.iletisim-hero {
+  padding-block: clamp(52px, 7.4vw, 106px) clamp(52px, 6.7vw, 96px);
+  background: var(--il-page-bg);
+}
+
+.iletisim-hero__inner {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(24px, 3vw, 44px);
+}
+
+.iletisim-kicker,
+.iletisim-hero__kicker {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 0;
+  color: var(--il-ink);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+}
+
+.iletisim-hero__kicker {
+  grid-column: 1 / -1;
+}
+
+.iletisim-hero__dot {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--il-magenta);
+}
+
+.iletisim-hero__title {
+  grid-column: 1 / -1;
+  max-width: 15ch;
+  /* 390px'te 44px, 1440px'te 84px: referansın iki satırlık kompozisyonu. */
+  margin: clamp(24px, 2.6vw, 38px) 0 0;
+  color: var(--il-ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(44px, 5.85vw, 84px);
+  font-weight: 400;
+  line-height: 1.07;
+  letter-spacing: -0.03em;
+}
+
+.iletisim-hero__title em {
+  color: var(--il-magenta);
+  font-style: italic;
+}
+
+.iletisim-hero__lead {
+  /* Referansta açıklama başlığın altında, kabuğun sağ ucuna yaslanır:
+     ölçülen blok x 990→1358, iki satır. */
+  grid-column: 2;
+  justify-self: end;
+  max-width: 370px;
+  margin: clamp(16px, 1.4vw, 20px) 0 0;
+  color: var(--il-muted);
+  font-size: clamp(12.5px, 0.94vw, 13.5px);
+  font-weight: 400;
+  line-height: 1.92;
+}
+
+/* ── İletişim kartları ──────────────────────────────────────────────── */
+.iletisim-kanallar {
+  padding-block: var(--il-section-pad);
+  background: var(--il-contact-bg);
+}
+
+.iletisim-kanallar__title {
+  margin: 0 0 clamp(34px, 4.9vw, 71px);
+  color: var(--il-ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(32px, 3.65vw, 52px);
+  font-weight: 400;
+  line-height: 1.14;
+  letter-spacing: -0.026em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.contact-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(18px, 2.8vw, 40px);
+  align-items: stretch;
+}
+
+.contact-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(16px, 1.6vw, 22px);
+  /* Hareket sırasında ölçek merkezden değil, kartın kendi kutusundan
+     büyür; üç kart tek kompozisyon gibi açılır. */
+  transform-origin: 50% 60%;
+  border: 1px solid var(--il-hairline);
+  border-radius: clamp(16px, 1.3vw, 18px);
+  background: var(--white);
+  box-shadow: var(--il-card-shadow);
+}
+
+.contact-card__head {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  /* Üç kartın görsel üstü aynı hizada başlar: adres iki satır olsa da
+     başlık bloğu sabit yükseklikte kalır. */
+  min-height: 99px;
+  margin-bottom: 25px;
+}
+
+.contact-card__text {
+  min-width: 0;
+}
+
+.contact-card__title {
+  margin: 0;
+  color: var(--il-ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(23px, 1.9vw, 27px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.018em;
+}
+
+.contact-card__info {
+  margin-top: 18px;
+}
+
+.contact-card__info p {
+  margin: 0;
+  color: var(--il-muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.9;
+}
+
+.contact-card__info span {
+  display: block;
+}
+
+.contact-card__icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: clamp(36px, 3.1vw, 44px);
+  height: clamp(36px, 3.1vw, 44px);
+  border-radius: 50%;
+  transition: transform 400ms var(--il-ease);
+}
+
+.contact-card__icon svg {
+  width: 45%;
+  height: 45%;
+  stroke-linecap: round;
+}
+
+.contact-card__icon--turquoise {
+  background: #ddf2f6;
+  color: var(--il-turquoise);
+}
+
+.contact-card__icon--magenta {
+  background: #fbe2ef;
+  color: var(--il-magenta);
+}
+
+.contact-card__media {
+  position: relative;
+  /* Referans oranı 377/390. flex:1 ile kartlar aynı yüksekliğe oturur. */
+  flex: 1 1 auto;
+  overflow: hidden;
+  aspect-ratio: 377 / 390;
+  border-radius: clamp(12px, 1vw, 14px);
+  background: var(--il-contact-bg);
+}
+
+.contact-card__image,
+.contact-card__map {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.contact-card__image {
+  object-fit: cover;
+  /* Kartın dış ölçüsü sabit kalır; yalnızca maskenin içindeki görsel
+     yaklaşır. Ölçülen Stilla değeri: scale(1.1), 0.4s. */
+  transition: transform 400ms var(--il-ease);
+}
+
+.contact-card__map {
+  /* Harita kaydırmayı ele geçirmez; tıklama kartın kendi bağlantısına
+     gider. */
+  pointer-events: none;
+  filter: saturate(0.94);
+}
+
+/* Google'ın kendi atıf şeridinin üzerine binmemesi için biraz yukarıda
+   durur; atıf metni okunur kalır. */
+.contact-card__map-pill {
+  position: absolute;
+  bottom: 28px;
+  left: 14px;
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: var(--white);
+  box-shadow: 0 8px 20px -8px rgba(18, 63, 72, 0.34);
+  color: var(--il-ink);
+  font-size: 12px;
+  font-weight: 500;
+  /* Dar harita sütununda iki satıra bölünüp haritayı kapatmamalı. */
+  white-space: nowrap;
+}
+
+.contact-card__map-pill svg {
+  width: 11px;
+  height: 11px;
+  color: var(--il-magenta);
+}
+
+/* Kartın tamamı tek hedef: bağlantı kartı kaplar, harita iframe'i
+   etkileşimli bir öğenin içine yerleşmez. */
+.contact-card__link {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .contact-card:hover .contact-card__image {
+    transform: scale(1.1);
+  }
+
+  .contact-card:hover .contact-card__icon {
+    transform: translateY(-2px);
+  }
+}
+
+.contact-card__link:focus-visible {
+  outline: 2px solid var(--il-magenta);
+  outline-offset: 4px;
+}
+
+/* ── Hareketli şeritler ─────────────────────────────────────────────── */
+.deneyim {
+  /* Şeritler kasıtlı olarak viewport dışına taşar; taşma burada da
+     kırpılır, böylece yatay kaydırma çubuğu oluşmaz. */
+  overflow-x: clip;
+  padding-block: var(--il-section-pad);
+  background: var(--white);
+
+  --marquee-row: clamp(88px, 9.86vw, 142px);
+  --marquee-gap: clamp(6px, 0.7vw, 10px);
+}
+
+.deneyim__kicker {
+  justify-content: center;
+  margin-bottom: clamp(44px, 5.5vw, 80px);
+}
+
+.deneyim__rows {
+  display: grid;
+  gap: clamp(14px, 1.95vw, 28px);
+}
+
+.marquee {
+  position: relative;
+  overflow: hidden;
+  height: var(--marquee-row);
+}
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+  height: 100%;
+  /* İçerik dört kopya; tam bir kopya (%25) ötelenince ikinci kopya
+     birincinin yerine oturur, birleşme noktası görünmez. */
+  will-change: transform;
+  animation: marquee-left var(--marquee-duration, 20s) linear infinite;
+}
+
+.marquee--right .marquee__track {
+  animation-name: marquee-right;
+}
+
+/* Şerit hızı her genişlikte 55-65px/s bandında tutulur.
+
+   Kopya genişliği satır yüksekliğiyle birlikte ölçeklendiği için
+   (--marquee-row bir clamp'tir) sabit bir süre dar ekranlarda şeridi
+   belirgin biçimde yavaşlatırdı. Süre CSS'te vw ile doğrudan
+   ölçeklenemez -- zaman ve uzunluk birimleri clamp() içinde
+   karıştırılamaz -- bu yüzden ölçek basamaklı bir çarpanla verilir.
+
+   Taban süreler ölçülen kopya genişliklerinden türetildi (1440px'te
+   satır 1 = 1166px, satır 2 = 1474px, satır 3 = 1245px). */
+.deneyim {
+  --marquee-scale: 1;
+}
+
+@media (min-width: 892px) {
+  .deneyim {
+    --marquee-scale: 1.071;
+  }
+}
+
+@media (min-width: 1046px) {
+  .deneyim {
+    --marquee-scale: 1.256;
+  }
+}
+
+@media (min-width: 1227px) {
+  .deneyim {
+    --marquee-scale: 1.474;
+  }
+}
+
+@media (min-width: 1440px) {
+  .deneyim {
+    --marquee-scale: 1.592;
+  }
+}
+
+.marquee[data-row="1"] {
+  --marquee-duration: calc(12.2s * var(--marquee-scale));
+}
+
+.marquee[data-row="2"] {
+  --marquee-duration: calc(15.1s * var(--marquee-scale));
+}
+
+.marquee[data-row="3"] {
+  --marquee-duration: calc(13.03s * var(--marquee-scale));
+}
+
+@keyframes marquee-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-25%, 0, 0);
+  }
+}
+
+@keyframes marquee-right {
+  from {
+    transform: translate3d(-25%, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.marquee__group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--marquee-gap);
+  align-items: center;
+  height: 100%;
+  padding-right: var(--marquee-gap);
+}
+
+.marquee__cell {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  height: 100%;
+}
+
+.marquee__word {
+  padding-inline: clamp(12px, 1.4vw, 20px);
+  color: var(--il-ink);
+  font-size: clamp(52px, 7.64vw, 110px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.022em;
+  white-space: nowrap;
+}
+
+.marquee__shape {
+  height: 100%;
+  aspect-ratio: 1;
+}
+
+.marquee__shape--turquoise {
+  background: var(--il-turquoise);
+}
+
+.marquee__shape--mist {
+  background: #d9f1f5;
+}
+
+.marquee__shape--disc {
+  border-radius: 50%;
+}
+
+/* Yarım daire: bir kenarı tam yuvarlak, diğeri düz. */
+.marquee__shape--half {
+  border-radius: 999px 0 0 999px;
+}
+
+.marquee__shape--half.is-flipped {
+  border-radius: 0 999px 999px 0;
+}
+
+.marquee__photo {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  height: 100%;
+  background: var(--il-contact-bg);
+}
+
+.marquee__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.marquee__photo--circle {
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.marquee__photo--pill {
+  aspect-ratio: 1.62;
+  border-radius: 999px;
+}
+
+.marquee__photo--arch {
+  aspect-ratio: 1.62;
+  border-radius: clamp(16px, 1.8vw, 26px);
+}
+
+/* ── Son CTA ─────────────────────────────────────────────────────────── */
+.iletisim-cta {
+  padding-block: clamp(60px, 9.2vw, 132px) clamp(56px, 8vw, 116px);
+  background: var(--il-page-bg);
+}
+
+.iletisim-cta__inner {
+  display: flex;
+  gap: clamp(28px, 4vw, 56px);
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.iletisim-cta__title {
+  /* Referansta iki satır: "Kendinize ayıracağınız / zamanı birlikte
+     planlayalım." En uzun satır ~640px. */
+  max-width: min(700px, 100%);
+  margin: clamp(22px, 2.4vw, 34px) 0 0;
+  color: var(--il-ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(34px, 4.05vw, 58px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.028em;
+}
+
+.iletisim-cta__button {
+  flex: 0 0 auto;
+  gap: 18px;
+  min-height: 52px;
+  padding-inline: 26px;
+  border-color: var(--il-hairline);
+  border-radius: 8px;
+  color: var(--il-ink);
+}
+
+.iletisim-cta__arrow {
+  width: 14px;
+  height: 14px;
+  color: var(--il-magenta);
+  transition: transform 400ms var(--il-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .iletisim-cta__button:hover .iletisim-cta__arrow {
+    transform: translate3d(2px, -2px, 0);
+  }
+}
+
+/* ── Tablet ─────────────────────────────────────────────────────────── */
+@media (max-width: 919px) {
+  .iletisim-hero__lead {
+    grid-column: 1 / -1;
+    max-width: 46ch;
+  }
+
+  .contact-card__head {
+    min-height: 88px;
+    margin-bottom: 18px;
+  }
+}
+
+/* ── Mobil (referans: 390px) ────────────────────────────────────────── */
+@media (max-width: 649px) {
+  .iletisim-kanallar__title {
+    text-wrap: pretty;
+  }
+
+  /* Kartlar kompakt yatay düzene geçer: solda ikon + metin, sağda görsel.
+     Referansta kart 356×178, iç boşluk 14px, görsel sütunu ~132px. */
+  .contact-cards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  /* Referans: kart 356×178, iç boşluk 12px, görsel sütunu 132×154. */
+  .contact-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 40%;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .contact-card__head {
+    /* column-reverse + space-between: ikon üstte, başlık ve bilgi altta.
+       DOM sırası (metin, ikon) korunur, okuma sırası bozulmaz. */
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: space-between;
+    min-height: 130px;
+    margin-bottom: 0;
+  }
+
+  .contact-card__info {
+    margin-top: 8px;
+  }
+
+  .contact-card__info p {
+    font-size: 12px;
+    line-height: 1.75;
+  }
+
+  /* Yükseklik oranla sabitlenir. Aksi hâlde dikey kaynak görsel
+     (1024×1536) kendi doğal oranıyla kartı uzatır ve üç kart farklı
+     yükseklikte kalır. */
+  .contact-card__media {
+    aspect-ratio: 132 / 154;
+    height: auto;
+    border-radius: 12px;
+  }
+
+  .contact-card__map-pill {
+    right: 6px;
+    bottom: 20px;
+    left: 6px;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px 6px;
+    font-size: 9.5px;
+  }
+
+  .contact-card__map-pill svg {
+    width: 9px;
+    height: 9px;
+  }
+
+  .iletisim-cta__inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .iletisim-cta__button {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+/* ── Azaltılmış hareket ─────────────────────────────────────────────────
+   Hiçbir bilgi gizlenmez: kartlar tam ölçekte ve tam opaklıkta, şeritler
+   duruyor, hover yakınlaştırması kapalı. Lenis de başlatılmaz
+   (smooth-scroll.tsx). */
+@media (prefers-reduced-motion: reduce) {
+  /* Motion satır içi stil yazar; stylesheet'teki !important bunu geçer.
+     Böylece hidrasyon öncesinde bile hiçbir içerik gizli kalmaz. */
+  .contact-card,
+  .iletisim-hero__kicker,
+  .iletisim-hero__title,
+  .iletisim-hero__lead {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .marquee__track {
+    will-change: auto;
+    animation: none;
+  }
+
+  .contact-card:hover .contact-card__image,
+  .contact-card:hover .contact-card__icon,
+  .iletisim-cta__button:hover .iletisim-cta__arrow {
+    transform: none;
+  }
+}

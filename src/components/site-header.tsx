@@ -21,7 +21,7 @@ type Props = {
     öğe işareti bağlama göre değişir. */
 export function SiteHeader({ context, active }: Props) {
   const links = navItems(context);
-  const randevu = appointmentHref(context);
+  const randevu = appointmentHref;
 
   return (
     <header className="site-header">

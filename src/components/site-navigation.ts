@@ -1,6 +1,7 @@
 /** Header, mobil menü ve footer aynı bağlantı listesini buradan alır.
-    Ana sayfada bölüm bağlantıları sayfa içi çıpa olarak kalır (mevcut
-    yumuşak kaydırma davranışı korunur); alt sayfalarda ana sayfaya döner. */
+    Ana sayfada Hakkımızda sayfa içi çıpa olarak kalır (mevcut yumuşak
+    kaydırma davranışı korunur); alt sayfalarda ana sayfaya döner.
+    İletişim artık kendi sayfasıdır ve her bağlamda /iletisim'e gider. */
 
 export type SiteContext = "home" | "page";
 
@@ -13,7 +14,7 @@ export function navItems(context: SiteContext): NavItem[] {
   return [
     { id: "hakkimizda", href: `${home}#hakkimizda`, label: "Hakkımızda" },
     { id: "hizmetler", href: "/hizmetler", label: "Hizmetler" },
-    { id: "iletisim", href: `${home}#iletisim`, label: "İletişim" },
+    { id: "iletisim", href: "/iletisim", label: "İletişim" },
   ];
 }
 
@@ -21,6 +22,5 @@ export function brandHref(context: SiteContext) {
   return context === "home" ? "#anasayfa" : "/";
 }
 
-export function appointmentHref(context: SiteContext) {
-  return context === "home" ? "#iletisim" : "/#iletisim";
-}
+/** Randevu düğmesi her sayfada iletişim sayfasına götürür. */
+export const appointmentHref = "/iletisim";
