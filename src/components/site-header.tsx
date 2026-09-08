@@ -20,7 +20,7 @@ type Props = {
     ana sayfadaki hâliyle aynıdır; yalnızca bağlantı hedefleri ve aktif
     öğe işareti bağlama göre değişir. */
 export function SiteHeader({ context, active }: Props) {
-  const links = navItems(context);
+  const links = navItems;
   const randevu = appointmentHref;
 
   return (

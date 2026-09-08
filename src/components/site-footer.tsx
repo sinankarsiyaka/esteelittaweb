@@ -13,7 +13,7 @@ type Props = {
 /** Ana sayfadaki footer bileşeninin kendisi; klinik arka planı, koyu teal
     iç paneli, logosu, menüsü ve telif satırı değişmeden paylaşılır. */
 export function SiteFooter({ context, topHref }: Props) {
-  const links = navItems(context);
+  const links = navItems;
 
   return (
     <footer className="site-footer">

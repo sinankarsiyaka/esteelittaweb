@@ -3023,7 +3023,9 @@ main {
   position: sticky;
   top: 0;
   z-index: 60;
-  background: var(--il-page-bg);
+  /* /iletisim kendi zemin jetonunu tanımlar; tanımlamayan sayfalarda
+     porselen zemine düşer, böylece bar her zaman opak kalır. */
+  background: var(--il-page-bg, var(--porcelain));
 }
 
 .sticky-header .site-header {
@@ -3644,5 +3646,580 @@ main {
   .contact-card:hover .contact-card__icon,
   .iletisim-cta__button:hover .iletisim-cta__arrow {
     transform: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   /hakkimizda — Hakkımızda sayfası
+
+   Sanat yönü: dergi künyesi. Sayfa boyunca sabit bir sol ray hizası
+   (etiket ve başlıklar aynı iki sütunlu ritme oturur), geniş boşluk ve
+   dört farklı bölüm kompozisyonu kullanılır. Aynı düzen ailesi iki kez
+   tekrar etmez: künye + geniş bant, salt tipografi, yapışkan sahne,
+   kaymalı ikili, kapanış bandı.
+
+   Marka sistemi ortaktır: porselen zemin, turkuaz ve derin teal, yalnızca
+   vurgu olarak fuşya, Playfair Display başlık + Poppins gövde. Yeni ana
+   renk üretilmez.
+
+   Sayfada tek bir etiket (eyebrow) vardır; başlıklar kendi başına
+   yeterlidir.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.hakkimizda-main {
+  /* Yatay eksen kırpılır, dikey eksen görünür kalır: aksi hâlde
+     yapışkan header çalışmaz. */
+  overflow: clip visible;
+  background: var(--porcelain);
+
+  /* Bölümler arası dikey ritim; ana sayfadan daha ferah. */
+  --hk-pad: clamp(72px, 9.4vw, 148px);
+  /* Künye rayı: etiket ve başlıklar sayfa boyunca aynı hizadan başlar. */
+  --hk-rail: clamp(0px, 12vw, 168px);
+  --hk-gutter: clamp(0px, 4.4vw, 64px);
+}
+
+/* ── Ortak tipografi ─────────────────────────────────────────────────── */
+.hk-section-title {
+  max-width: 18ch;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(30px, 3.75vw, 54px);
+  font-weight: 400;
+  /* İtalik vurgularda alt uzantı (y, ğ, ş) kırpılmasın diye 1.1'in
+     altına inilmez. */
+  line-height: 1.14;
+  letter-spacing: -0.028em;
+}
+
+.hk-section-title em,
+.hk-hero__title em,
+.hk-manifesto__title em,
+.hk-kapanis__title em {
+  color: var(--magenta);
+  font-style: italic;
+}
+
+/* Satır maskesi satır satır açılabilsin diye her satır blok olur. */
+.hk-section-title .mask-line,
+.hk-manifesto__title .mask-line,
+.hk-kapanis__title .mask-line {
+  display: block;
+}
+
+.hk-note {
+  width: min(100% - 48px, 1240px);
+  margin: clamp(18px, 2vw, 28px) auto 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 300;
+  text-align: right;
+}
+
+/* ── 1. Künye ────────────────────────────────────────────────────────── */
+.hk-hero {
+  padding-block: clamp(30px, 4.4vw, 62px) var(--hk-pad);
+}
+
+.hk-hero__inner {
+  display: grid;
+  grid-template-columns: var(--hk-rail) minmax(0, 1fr);
+  column-gap: var(--hk-gutter);
+}
+
+.hk-hero__eyebrow {
+  grid-column: 1;
+  grid-row: 1;
+  /* Başlığın ilk satırının x-yüksekliğine oturur. */
+  margin: 0;
+  padding-top: 0.85em;
+  color: var(--turquoise-deep);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.hk-hero__title {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(40px, 5.35vw, 78px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.032em;
+}
+
+.hk-hero__lead {
+  grid-column: 2;
+  grid-row: 2;
+  max-width: 44ch;
+  margin: clamp(20px, 2.2vw, 32px) 0 0;
+  color: var(--muted);
+  font-size: clamp(14px, 1.05vw, 16px);
+  font-weight: 300;
+  line-height: 1.85;
+}
+
+/* Geniş görsel bandı: alttan yukarı açılan perde + ölçülü parallax. */
+.story-band {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 21 / 9;
+  margin-top: clamp(36px, 5vw, 76px);
+  border-radius: clamp(16px, 1.5vw, 22px);
+  background: var(--mist);
+}
+
+/* Kırpma dış kutuda değil burada durur. Gözlenen eleman kendini
+   kırparsa görünür alanı sıfırlanır, IntersectionObserver onu hiç
+   görmez ve maske açılmaz. Köşe yuvarlatmasını dıştaki overflow: hidden
+   sağladığı için burada "round" gerekmez. */
+.story-band__mask {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.15s var(--ease-calm);
+}
+
+.story-band.is-open .story-band__mask {
+  clip-path: inset(0 0 0 0);
+}
+
+/* İç kutu maskeden yüksek: dikey kayma sırasında kenarda boşluk açılmaz. */
+.story-band__inner {
+  position: absolute;
+  inset: -7% 0;
+  will-change: transform;
+}
+
+.story-band__inner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── 2. Manifesto ────────────────────────────────────────────────────── */
+.hk-manifesto {
+  padding-block: var(--hk-pad) 0;
+}
+
+/* Kenardan kenara tek kare: sayfadaki tek tam genişlik görseli.
+   Kabuğun dışında durur, köşeleri kırılmaz. */
+.hk-bleed {
+  /* Kaynak 2:1; burada biraz daha sinematik bir şeride kırpılır, böylece
+     tam genişlikte fazla dikey yer kaplamaz. */
+  aspect-ratio: 2.6 / 1;
+  margin-top: var(--hk-pad);
+  border-radius: 0;
+}
+
+.hk-manifesto__inner {
+  display: grid;
+  grid-template-columns: var(--hk-rail) minmax(0, 1fr);
+  column-gap: var(--hk-gutter);
+}
+
+.hk-manifesto__inner > * {
+  grid-column: 2;
+}
+
+.hk-manifesto__title {
+  max-width: 20ch;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(28px, 3.55vw, 52px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.026em;
+}
+
+.hk-manifesto__body {
+  max-width: 56ch;
+  margin: clamp(26px, 3vw, 42px) 0 0;
+  color: var(--muted);
+  font-size: clamp(14px, 1.05vw, 16px);
+  font-weight: 300;
+  line-height: 1.9;
+}
+
+/* ── 3. Yapışkan sahne ───────────────────────────────────────────────── */
+.hk-approach {
+  padding-block: var(--hk-pad);
+  background: var(--white);
+
+  /* Görsel sütunu metinden bir tık geniş: fotoğraf ağırlığı taşır,
+     metin ölçüsü de sütununu doldurur. */
+  --approach-cols: 1.08fr 0.92fr;
+  --approach-gap: clamp(28px, 4vw, 68px);
+}
+
+/* Bölüm başlığı, tanıttığı metin sütununun tam üstünde durur: aşağıdaki
+   ızgarayla aynı sütun ölçüsünü kullanır, böylece sayfada boşlukta
+   asılı kalmaz. */
+.hk-approach__head {
+  display: grid;
+  grid-template-columns: var(--approach-cols);
+  column-gap: var(--approach-gap);
+  margin-bottom: clamp(30px, 3.6vw, 54px);
+}
+
+.hk-approach__head .hk-section-title {
+  grid-column: 2;
+  /* Dar sütunda "size özel." satır ortasında bölünmesin diye ölçek biraz
+     düşürülür; başlık iki doğal satıra oturur. */
+  max-width: none;
+  font-size: clamp(28px, 3.1vw, 44px);
+}
+
+.approach__grid {
+  display: grid;
+  grid-template-columns: var(--approach-cols);
+  grid-template-rows: repeat(3, auto);
+  column-gap: var(--approach-gap);
+}
+
+/* Üç fotoğraf aynı hücrede üst üste durur ve bölüm boyunca yapışır.
+   Hangisinin görüneceğini kaydırma ilerlemesi belirler. */
+.approach__figure {
+  position: sticky;
+  top: 96px;
+  grid-row: 1 / -1;
+  grid-column: 1;
+  align-self: start;
+  overflow: hidden;
+  /* Yükseklik viewport'a bağlıdır, orana değil: görsel her ekranda
+     yapışkan konumdayken tam görünür kalır ve alt kenarı kırpılmaz.
+     İçerideki fotoğraf object-fit: cover ile kutuya uyar. */
+  height: min(70vh, 700px);
+  margin: 0;
+  border-radius: clamp(14px, 1.3vw, 18px);
+  background: var(--mist);
+}
+
+.approach__figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Metin sütununun kenarındaki ilerleme çizgisi: bölümün neresinde
+   olunduğunu gösterir. Blokların border-left'i sabit rayı, bu öğe ise
+   dolan kısmı çizer. */
+.approach__rail {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  justify-self: start;
+  width: 2px;
+  height: 100%;
+  background: var(--turquoise);
+  transform-origin: 50% 0;
+}
+
+/* Her ilke, yapışkan görselin yanında tek başına okunacak kadar yer
+   kaplar. Metin sütununun toplam yüksekliği görselden belirgin biçimde
+   fazladır; görselin yapışıp yol alacağı mesafe buradan doğar. */
+.approach__block {
+  display: flex;
+  flex-direction: column;
+  grid-column: 2;
+  justify-content: center;
+  min-height: max(320px, 44vh);
+  padding-left: clamp(22px, 2.6vw, 38px);
+  border-left: 1px solid var(--line);
+}
+
+.approach__block:nth-of-type(1) {
+  grid-row: 1;
+}
+
+.approach__block:nth-of-type(2) {
+  grid-row: 2;
+}
+
+.approach__block:nth-of-type(3) {
+  grid-row: 3;
+}
+
+.approach__title {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(22px, 2.1vw, 30px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.018em;
+}
+
+.approach__body {
+  max-width: 46ch;
+  margin: clamp(12px, 1.2vw, 18px) 0 0;
+  color: var(--muted);
+  font-size: clamp(14px, 1.06vw, 16px);
+  font-weight: 300;
+  line-height: 1.85;
+}
+
+/* ── 4. Mekân ────────────────────────────────────────────────────────── */
+.hk-mekan {
+  padding-block: var(--hk-pad);
+}
+
+.hk-mekan__inner {
+  display: grid;
+  grid-template-columns: var(--hk-rail) minmax(0, 1fr);
+  column-gap: var(--hk-gutter);
+}
+
+.hk-mekan__copy {
+  grid-column: 2;
+}
+
+.hk-mekan__body {
+  max-width: 48ch;
+  margin: clamp(18px, 2vw, 28px) 0 0;
+  color: var(--muted);
+  font-size: clamp(14px, 1.05vw, 16px);
+  font-weight: 300;
+  line-height: 1.85;
+}
+
+/* İki düzlem, iki farklı yükseklik ve iki farklı kayma hızı. */
+.mekan__duet {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: 1.52fr 1fr;
+  gap: clamp(18px, 2.6vw, 44px);
+  align-items: start;
+  margin-top: clamp(36px, 4.6vw, 72px);
+}
+
+.mekan__wide,
+.mekan__tall {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  border-radius: clamp(16px, 1.5vw, 22px);
+  background: var(--mist);
+  will-change: transform;
+}
+
+.mekan__wide {
+  aspect-ratio: 4 / 3;
+}
+
+.mekan__tall {
+  /* Aşağı kaydırılmış ikinci düzlem: kompozisyon kolaj gibi durmasın. */
+  aspect-ratio: 0.86;
+  margin-top: clamp(44px, 8vw, 132px);
+}
+
+.mekan__wide img,
+.mekan__tall img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── 5. Kapanış bandı ────────────────────────────────────────────────── */
+.hk-kapanis {
+  padding-block: clamp(78px, 10vw, 156px);
+  background: var(--mist);
+}
+
+.hk-kapanis__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.hk-kapanis__title {
+  max-width: 20ch;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(30px, 3.9vw, 56px);
+  font-weight: 400;
+  line-height: 1.14;
+  letter-spacing: -0.028em;
+}
+
+.hk-kapanis__body {
+  max-width: 52ch;
+  margin: clamp(20px, 2.2vw, 30px) 0 0;
+  color: var(--muted);
+  font-size: clamp(14px, 1.05vw, 16px);
+  font-weight: 300;
+  line-height: 1.85;
+}
+
+.hk-kapanis__cta {
+  margin-top: clamp(28px, 3.2vw, 44px);
+}
+
+/* ── Tablet ──────────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .approach__figure {
+    top: 88px;
+  }
+}
+
+/* ── Yapışkan sahnenin mobil hâli ────────────────────────────────────
+   Tek sütuna düşer. DOM sırası "görsel, blok, görsel, blok..." olduğu
+   için metin ve görsel doğal sırayla okunur; ikinci bir görsel kümesi
+   basılmaz.
+
+   Çapraz geçiş yalnızca masaüstünde anlamlıdır: burada üç fotoğraf da
+   akış içinde olduğundan opaklık sabitlenir. Motion satır içi stil
+   yazdığı için !important gerekir. */
+@media (max-width: 919px) {
+  .hk-approach__head,
+  .approach__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hk-approach__head .hk-section-title {
+    grid-column: 1;
+  }
+
+  .approach__grid {
+    grid-template-rows: none;
+    row-gap: clamp(20px, 4vw, 30px);
+  }
+
+  /* Masaüstündeki açık satır yerleşimleri burada geri alınır. nth-of-type
+     seçicileri daha yüksek özgüllükte olduğu için aynı özgüllükle
+     sıfırlanmaları gerekir; aksi hâlde bloklar ilk üç satırı kapar ve
+     görseller metinlerden kopup altta toplanır. */
+  .approach__figure,
+  .approach__block,
+  .approach__block:nth-of-type(1),
+  .approach__block:nth-of-type(2),
+  .approach__block:nth-of-type(3) {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .approach__figure {
+    position: static;
+    aspect-ratio: 0.92;
+    height: auto;
+    opacity: 1 !important;
+  }
+
+  .approach__block {
+    display: block;
+    min-height: 0;
+    padding-block: 0 clamp(34px, 7vw, 56px);
+    padding-left: clamp(18px, 3.4vw, 26px);
+  }
+
+  .approach__block:nth-of-type(3) {
+    padding-bottom: 0;
+  }
+
+  .approach__rail {
+    display: none;
+  }
+
+  .mekan__duet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mekan__wide {
+    aspect-ratio: 16 / 11;
+  }
+
+  .mekan__tall {
+    aspect-ratio: 4 / 3;
+    margin-top: 0;
+  }
+}
+
+/* ── Mobil (390px referans) ──────────────────────────────────────────── */
+@media (max-width: 649px) {
+  .hakkimizda-main {
+    --hk-pad: clamp(64px, 15vw, 84px);
+  }
+
+  .hk-hero__inner,
+  .hk-manifesto__inner,
+  .hk-mekan__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hk-hero__eyebrow,
+  .hk-hero__title,
+  .hk-hero__lead,
+  .hk-manifesto__inner > *,
+  .hk-mekan__copy {
+    grid-column: 1;
+  }
+
+  .hk-hero__eyebrow {
+    grid-row: auto;
+    padding-top: 0;
+  }
+
+  .hk-hero__title,
+  .hk-hero__lead {
+    grid-row: auto;
+  }
+
+  .hk-hero__title {
+    margin-top: 14px;
+  }
+
+  .hk-approach__head {
+    padding-left: 0;
+  }
+
+  /* Dar ekranda 21:9 bant ince bir şeride dönüşür; oran yükseltilir. */
+  .story-band {
+    aspect-ratio: 4 / 3;
+  }
+
+  .hk-bleed {
+    aspect-ratio: 3 / 2;
+  }
+
+  .hk-note {
+    width: min(100% - 48px, 1240px);
+    text-align: left;
+  }
+}
+
+/* ── Azaltılmış hareket ──────────────────────────────────────────────
+   Hiçbir içerik gizli kalmaz: bant tam açık, üç fotoğraf da görünür,
+   parallax ve ilerleme çizgisi durur. Lenis de başlatılmaz
+   (smooth-scroll.tsx). */
+@media (prefers-reduced-motion: reduce) {
+  .story-band__mask {
+    clip-path: none !important;
+  }
+
+  .story-band__inner,
+  .mekan__wide,
+  .mekan__tall {
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .approach__figure,
+  .approach__block {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .approach__rail {
+    transform: scaleY(1) !important;
   }
 }
