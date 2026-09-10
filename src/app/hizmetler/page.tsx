@@ -5,7 +5,7 @@ import { LeafSprig } from "@/components/leaf-sprig";
 import { Reveal } from "@/components/reveal";
 import { ServicesGallery } from "@/components/services-gallery";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { HeaderSlot } from "@/components/header-slot";
 import { SiteLink } from "@/components/site-link";
 import { instagramHref } from "@/data/site";
 
@@ -52,7 +52,7 @@ export default function HizmetlerPage() {
       </noscript>
 
       <section className="hizmetler-hero" id={TOP_ID}>
-        <SiteHeader context="page" active="hizmetler" />
+        <HeaderSlot />
         <div className="hizmetler-hero__topline" aria-hidden="true" />
 
         <div className="hizmetler-hero__inner section-shell">
@@ -98,11 +98,11 @@ export default function HizmetlerPage() {
             <div className="hizmetler-hero__stage">
               <figure className="arch-photo arch-photo--hero">
                 <Image
-                  src="/media/hakkimizda-gorseller-v1/01-cilt-bakimi-uzman.png"
-                  alt="Uzmanın, gözleri kapalı dinlenen danışana yüz maskesi uyguladığı temsili bakım anı."
+                  src="/media/impeccable-final-v1/hizmetler-hero-studio-hazirlik-v1.png"
+                  alt="Gün ışığı alan bakım stüdyosunda, uygulama öncesi hazırlanan temsili bir tepsi ve havlu düzeni."
                   fill
                   sizes="(min-width: 1288px) 430px, (min-width: 920px) 34vw, (min-width: 650px) min(430px, 62vw), min(300px, 74vw)"
-                  style={{ objectPosition: "50% 40%" }}
+                  style={{ objectPosition: "50% 38%" }}
                   priority
                 />
               </figure>
@@ -144,14 +144,16 @@ export default function HizmetlerPage() {
         id={GALLERY_ID}
         aria-labelledby="hizmet-galerisi-baslik"
       >
-        <Reveal className="hizmet-galerisi__intro">
+        <Reveal once className="hizmet-galerisi__intro">
+          {/* Kicker kaldırıldı: sayfa hero'su zaten "Esteelitta Hizmetler"
+              etiketiyle açılıyor ve bu bölüm, başlığın yanındaki "08
+              uzmanlık alanı" sayacıyla kendini adlandırıyor. Üç bölümün
+              üçünde de "Esteelitta X" kickerı tekrarlanmaz. */}
           <div className="atlas-intro">
-            <p className="atlas-kicker">Esteelitta Bakım Atlası</p>
-
             <h2 id="hizmet-galerisi-baslik" className="atlas-title mask-line">
               Bakımın
               <br />
-              <em>sekiz hali.</em>
+              <em className="brand-emphasis">sekiz</em> hali.
             </h2>
 
             <p className="atlas-lead">
@@ -181,19 +183,21 @@ export default function HizmetlerPage() {
 
       <section className="surec" aria-labelledby="surec-baslik">
         <div className="surec__inner section-shell">
-          <Reveal className="surec__head">
+          <Reveal once className="surec__head">
             <p className="section-kicker rule-kicker">Esteelitta Deneyimi</p>
             <h2 id="surec-baslik" className="section-title mask-line">
               <span>
-                Her adımda <em>özen,</em>
+                Her adımda özen,
               </span>
-              <span>her dokunuşta güven.</span>
+              <span>
+                her dokunuşta <em className="brand-emphasis">güven.</em>
+              </span>
             </h2>
           </Reveal>
 
           <ol className="surec__steps">
             {steps.map((step) => (
-              <Reveal as="li" key={step.no} className="surec__step">
+              <Reveal once as="li" key={step.no} className="surec__step">
                 <span className="surec__num" aria-hidden="true">
                   {step.no}
                 </span>
@@ -205,7 +209,7 @@ export default function HizmetlerPage() {
             ))}
           </ol>
 
-          <Reveal className="surec__visual">
+          <Reveal once className="surec__visual">
             {/* Maskenin 0.94 oranında kırpılmış türev; yatay kaynakta
                 cover kırpımının harcadığı yükseklik geri kazanıldı. */}
             <figure className="blob-photo">
@@ -243,11 +247,11 @@ export default function HizmetlerPage() {
         <span className="bilgi-cta__wash bilgi-cta__wash--right" aria-hidden="true" />
 
         <div className="bilgi-cta__inner section-shell">
-          <Reveal className="bilgi-cta__copy">
+          <Reveal once className="bilgi-cta__copy">
             <h2 id="bilgi-cta-baslik" className="bilgi-cta__title mask-line">
               <span>Hangi bakımın</span>
               <span>
-                <em>size uygun</em>
+                <em className="brand-emphasis">size uygun</em>
               </span>
               <span>olduğundan emin değil misiniz?</span>
             </h2>
@@ -292,13 +296,13 @@ export default function HizmetlerPage() {
 
               <span className="bilgi-cta__split" aria-hidden="true" />
 
-              <SiteLink className="arrow-link" href="/#iletisim">
+              <SiteLink className="arrow-link" href="/iletisim">
                 <span>İletişim sayfasına git</span>
               </SiteLink>
             </div>
           </Reveal>
 
-          <Reveal className="bilgi-cta__visual" order={1}>
+          <Reveal once className="bilgi-cta__visual" order={1}>
             {/* Kemerin 0.62 oranında dikey türev. Önceki yatay V1
                 dosyası bu çok dikey maskede büyütülüyordu. */}
             <figure className="arch-photo arch-photo--cta">

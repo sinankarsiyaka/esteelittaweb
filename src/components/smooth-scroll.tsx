@@ -4,6 +4,8 @@ import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import { useEffect } from "react";
 
+import { setLenis } from "@/components/lenis-store";
+
 /** Stilla'nın masaüstü kaydırma hissi: tekerlek hareketi yumuşatılır,
     dokunmatik kaydırma tarayıcının kendi davranışında bırakılır.
 
@@ -28,6 +30,7 @@ export function SmoothScroll() {
       frame = 0;
       lenis?.destroy();
       lenis = null;
+      setLenis(null);
     };
 
     const start = () => {
@@ -44,6 +47,8 @@ export function SmoothScroll() {
         // yürür; aksi hâlde yerel atlama ile yumuşatma çakışır.
         anchors: true,
       });
+
+      setLenis(lenis);
 
       const raf = (time: number) => {
         lenis?.raf(time);

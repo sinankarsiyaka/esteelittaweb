@@ -1,7 +1,7 @@
 /** Header, mobil menü ve footer aynı bağlantı listesini buradan alır.
     Hakkımızda ve İletişim artık kendi sayfalarıdır; her bağlamda kendi
-    rotalarına gider. Ana sayfadaki #hakkimizda ve #iletisim bölümleri
-    yerinde durmayı sürdürür, yalnızca menüden hedeflenmezler. */
+    rotalarına gider. Ana sayfadaki #hakkimizda bölümü yerinde durmayı
+    sürdürür, yalnızca menüden hedeflenmez. */
 
 export type SiteContext = "home" | "page";
 

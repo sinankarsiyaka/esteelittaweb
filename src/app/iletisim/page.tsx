@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 
 import { ContactCards } from "@/components/iletisim/contact-cards";
 import { ContactHero } from "@/components/iletisim/contact-hero";
-import { ExperienceMarquee } from "@/components/iletisim/experience-marquee";
+import { ExperienceValues } from "@/components/iletisim/experience-values";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
 import { SmoothScroll } from "@/components/smooth-scroll";
-import { StickyHeader } from "@/components/sticky-header";
+import { HeaderSlot } from "@/components/header-slot";
 import { instagramHref } from "@/data/site";
 
 export const metadata: Metadata = {
@@ -33,9 +32,7 @@ export default function IletisimPage() {
 
       <SmoothScroll />
 
-      <StickyHeader>
-        <SiteHeader context="page" active="iletisim" />
-      </StickyHeader>
+      <HeaderSlot />
 
       <section className="iletisim-hero">
         <ContactHero />
@@ -50,7 +47,7 @@ export default function IletisimPage() {
         </div>
       </section>
 
-      <ExperienceMarquee />
+      <ExperienceValues />
 
       <section className="iletisim-cta" aria-labelledby="cta-basligi">
         <div className="section-shell iletisim-cta__inner">
@@ -60,7 +57,8 @@ export default function IletisimPage() {
               Küçükyalı · İstanbul
             </p>
             <h2 className="iletisim-cta__title" id="cta-basligi">
-              Kendinize ayıracağınız zamanı birlikte planlayalım.
+              Kendinize ayıracağınız zamanı{" "}
+              <em className="brand-emphasis">birlikte</em> planlayalım.
             </h2>
           </div>
 

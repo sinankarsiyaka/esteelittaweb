@@ -9,9 +9,19 @@ import { useCallback, useRef, type CSSProperties, type ReactNode } from "react";
     state'i her karede güncellenmez, hareket transform/opacity üzerinde
     kalır ve mesafe/süre medya sorgularıyla (mobilde daha kısa) ayarlanır.
 
-    once verilmediği için durum iki yönlü çalışır: yukarı kaydırıp geri
-    inildiğinde içerik yeniden yerine oturur. */
+    once verilmediğinde durum iki yönlüdür: görünüm alanından çıkan içerik
+    yeniden gizlenir. Bu davranış sistemin motion kuralıyla çelişiyordu
+    ("görünür olan içerik bir daha gizlenmez"), çünkü .reveal opacity: 0 ile
+    başlar ve /hizmetler galerisinde ayrıca clip-path maskesi taşır: sekiz
+    hizmet görseli yukarı kaydırılıp geri dönüldüğünde tamamen kayboluyordu.
+
+    Varsayılan bilinçli olarak değiştirilmedi; bunun yerine mevcut bütün
+    çağrı noktaları açıkça `once` veriyor. Böylece davranış her kullanım
+    yerinde okunur kalır ve ileride gerçekten iki yönlü bir hareket
+    gerekirse bu bileşen hâlâ onu sunabilir. */
 const VIEWPORT = { amount: 0.16, margin: "0px 0px -6% 0px" } as const;
+/** Büyük giriş hareketleri geri kaydırınca yeniden oynamamalıdır. */
+const VIEWPORT_ONCE = { ...VIEWPORT, once: true } as const;
 
 type Props = {
   children: ReactNode;
@@ -19,6 +29,9 @@ type Props = {
   as?: "div" | "li";
   /** Aynı anda giren kardeşler için kademe (yaklaşık 75 ms adım). */
   order?: number;
+  /** Bir kez oynayıp yerinde kalsın: ana sayfadaki büyük panel ve tuval
+      açılışları için. Verilmezse davranış eskisi gibi iki yönlüdür. */
+  once?: boolean;
   style?: CSSProperties;
 };
 
@@ -27,10 +40,11 @@ export function Reveal({
   className,
   as = "div",
   order = 0,
+  once = false,
   style,
 }: Props) {
   const ref = useRef<HTMLElement | null>(null);
-  const inView = useInView(ref, VIEWPORT);
+  const inView = useInView(ref, once ? VIEWPORT_ONCE : VIEWPORT);
   const setNode = useCallback((node: HTMLElement | null) => {
     ref.current = node;
   }, []);

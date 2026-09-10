@@ -8,10 +8,9 @@ import { SpaceDuet } from "@/components/hakkimizda/space-duet";
 import { StoryBand } from "@/components/hakkimizda/story-band";
 import { Reveal } from "@/components/reveal";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
 import { SiteLink } from "@/components/site-link";
 import { SmoothScroll } from "@/components/smooth-scroll";
-import { StickyHeader } from "@/components/sticky-header";
+import { HeaderSlot } from "@/components/header-slot";
 import { appointmentHref } from "@/components/site-navigation";
 
 export const metadata: Metadata = {
@@ -37,19 +36,20 @@ const approach: ApproachItem[] = [
   {
     title: "Hijyen ve şeffaflık",
     body: "Her uygulama öncesi oda ve malzeme yeniden hazırlanır. Hangi ürünü neden kullandığımızı sorulmadan anlatırız.",
-    src: "/media/hizmetler-page-support-v2/surec-bakim-odasi.webp",
-    alt: "Uygulama öncesi hazırlanmış temsili bakım odası: temiz havlular ve düzenli tezgâh.",
-    width: 1122,
-    height: 1194,
+    src: "/media/impeccable-final-v1/hakkimizda-hijyen-hazirlik-v1.png",
+    alt: "Uygulama öncesi hazırlanan temsili hijyen tepsisi: katlı havlular ve düzenli malzemeler.",
+    width: 1228,
+    height: 1281,
+    objectPosition: "50% 45%",
   },
   {
     title: "Ölçülü uzmanlık",
     body: "Abartısız, doğal sonuçlar hedefliyoruz. Size uygun olmayan bir uygulamayı önermek yerine nedenini açıklamayı tercih ediyoruz.",
-    src: "/media/hizmetler-page-support-v2/cta-cilt-bakimi.webp",
-    alt: "Yüz bakımı sırasında gözleri kapalı, rahatlamış bir danışanın temsili görseli.",
-    width: 952,
-    height: 1536,
-    objectPosition: "50% 30%",
+    src: "/media/impeccable-final-v1/hakkimizda-olculu-uzmanlik-v1.png",
+    alt: "Bir ürünün danışanın bileğinde nazikçe test edildiği, ölçülü bir danışma anının temsili görseli.",
+    width: 1228,
+    height: 1281,
+    objectPosition: "50% 42%",
   },
 ];
 
@@ -69,9 +69,7 @@ export default function HakkimizdaPage() {
 
       <SmoothScroll />
 
-      <StickyHeader>
-        <SiteHeader context="page" active="hakkimizda" />
-      </StickyHeader>
+      <HeaderSlot />
 
       {/* 1. Masthead. Etiket sol kenarda, başlık içeri girintili: sayfanın
           ilk bakışta bir dergi künyesi gibi okunmasını sağlar. */}
@@ -106,17 +104,17 @@ export default function HakkimizdaPage() {
           kenardan kenara tek bir kareyle kapanır. */}
       <section className="hk-manifesto" aria-labelledby="manifesto-baslik">
         <div className="section-shell hk-manifesto__inner">
-          <Reveal>
+          <Reveal once>
             <h2 id="manifesto-baslik" className="hk-manifesto__title">
               <span className="mask-line">Güzelliği bir hedef değil,</span>
               <span className="mask-line">kendinize ayırdığınız</span>
               <span className="mask-line">
-                <em>zamanın</em> sonucu sayıyoruz.
+                <em className="brand-emphasis">zamanın</em> sonucu sayıyoruz.
               </span>
             </h2>
           </Reveal>
 
-          <Reveal order={1}>
+          <Reveal once order={1}>
             <p className="hk-manifesto__body">
               Cildinizi, ritminizi ve beklentinizi dinliyoruz. Sonra yalnızca
               gerekeni, gerektiği kadar uyguluyoruz. Amacımız görünüşünüzü
@@ -140,10 +138,11 @@ export default function HakkimizdaPage() {
       {/* 3. İmza kaydırma anı: yapışkan görsel, okunan ilkeye cevap verir. */}
       <section className="hk-approach" aria-labelledby="yaklasim-baslik">
         <div className="section-shell">
-          <Reveal className="hk-approach__head">
+          <Reveal once className="hk-approach__head">
             <h2 id="yaklasim-baslik" className="hk-section-title">
               <span className="mask-line">
-                Sakin, ölçülü ve <em>size özel.</em>
+                Sakin, ölçülü ve{" "}
+                <em className="brand-emphasis">size özel.</em>
               </span>
             </h2>
           </Reveal>
@@ -156,11 +155,11 @@ export default function HakkimizdaPage() {
           hızlarda: kolaj değil, derinlik. */}
       <section className="hk-mekan" aria-labelledby="mekan-baslik">
         <div className="section-shell hk-mekan__inner">
-          <Reveal className="hk-mekan__copy">
+          <Reveal once className="hk-mekan__copy">
             <h2 id="mekan-baslik" className="hk-section-title">
               <span className="mask-line">Kapıdan girdiğiniz an</span>
               <span className="mask-line">
-                <em>yavaşlar.</em>
+                <em className="brand-emphasis">yavaşlar.</em>
               </span>
             </h2>
 
@@ -179,14 +178,16 @@ export default function HakkimizdaPage() {
       {/* 5. Kapanış: uygulama sonrası iletişim ve tek bir çağrı. */}
       <section className="hk-kapanis" aria-labelledby="kapanis-baslik">
         <div className="section-shell hk-kapanis__inner">
-          <Reveal>
+          <Reveal once>
             <h2 id="kapanis-baslik" className="hk-kapanis__title">
               <span className="mask-line">Uygulamadan sonra da</span>
-              <span className="mask-line">yanınızdayız.</span>
+              <span className="mask-line">
+                <em className="brand-emphasis">yanınızdayız.</em>
+              </span>
             </h2>
           </Reveal>
 
-          <Reveal order={1}>
+          <Reveal once order={1}>
             <p className="hk-kapanis__body">
               Bakım sonrası nelere dikkat etmeniz gerektiğini birlikte
               konuşuyoruz. Aklınıza sonradan bir soru takılırsa yanıtlamak için
@@ -194,7 +195,7 @@ export default function HakkimizdaPage() {
             </p>
           </Reveal>
 
-          <Reveal order={2}>
+          <Reveal once order={2}>
             <SiteLink className="button hk-kapanis__cta" href={appointmentHref}>
               Randevu Al
             </SiteLink>

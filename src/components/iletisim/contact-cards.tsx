@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { useRef, type ReactNode } from "react";
 
 import {
@@ -44,7 +44,7 @@ type CardProps = {
   index: number;
   title: string;
   icon: ReactNode;
-  iconTone: "turquoise" | "magenta";
+  iconTone: "turquoise";
   info: ReactNode;
   href: string;
   linkLabel: string;
@@ -64,7 +64,6 @@ function ContactCard({
   media,
 }: CardProps) {
   const ref = useRef<HTMLElement>(null);
-  const reduceMotion = useReducedMotion();
   // Kart üstü viewport'un altındayken 0, viewport'un %62'sine geldiğinde 1.
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -83,7 +82,12 @@ function ContactCard({
     <motion.article
       ref={ref}
       className="contact-card"
-      style={reduceMotion ? undefined : { scale, opacity }}
+      /* Stil azaltılmış hareket tercihine göre dallandırılmaz: bu, sunucu
+         (useReducedMotion → null) ile tarayıcı çıktısını ayırıp hidrasyon
+         uyuşmazlığı üretiyordu. Tercih açıkken kartların görünürlüğünü
+         globals.css'teki reduced-motion bloğu garanti eder
+         (opacity: 1 !important; transform: none !important). */
+      style={{ scale, opacity }}
     >
       <div className="contact-card__head">
         <div className="contact-card__text">
@@ -161,13 +165,13 @@ export function ContactCards() {
         linkLabel={`Bizi arayın: ${contactPhone}`}
         media={
           <Image
-            src="/media/hakkimizda-gorseller-v1/01-cilt-bakimi-uzman.png"
-            alt="Uzmanın danışana yüz bakımı uyguladığı temsili an."
-            width={1024}
-            height={1536}
+            src="/media/impeccable-final-v1/iletisim-karsilama-eli-v1.png"
+            alt="Esteelitta resepsiyonunda misafire uzatılan bir bardak suyla karşılama anının temsili görseli."
+            width={1122}
+            height={1402}
             sizes={MEDIA_SIZES}
             className="contact-card__image"
-            style={{ objectPosition: "50% 38%" }}
+            style={{ objectPosition: "50% 40%" }}
           />
         }
       />
@@ -181,13 +185,20 @@ export function ContactCards() {
         href={contactEmailHref}
         linkLabel={`E-posta gönderin: ${contactEmail}`}
         media={
+          /* Bu yuvada eskiden /hakkimizda'daki resepsiyon görseli vardı;
+             aynı dosya iki sayfada birden kullanılıyordu. Havuzdaki
+             kullanılmayan tek marka uyumlu görselle değiştirildi:
+             gün ışığı alan bir bakım odası. İletişim sayfasında "bize
+             ulaşınca geleceğiniz yer" anlamını taşır ve resepsiyon
+             görseli artık yalnızca /hakkimizda'ya ait. */
           <Image
-            src="/media/hakkimizda-gorseller-v1/02-resepsiyon-temsili.png"
-            alt="Esteelitta resepsiyon alanının temsili görünümü."
-            width={1448}
-            height={1086}
+            src="/media/homepage-v2/06-kapanis-atmosfer-v1.webp"
+            alt="Esteelitta bakım odasının temsili görünümü: tül perdeli geniş pencere, gün ışığı ve arkada İstanbul manzarası."
+            width={1774}
+            height={887}
             sizes={MEDIA_SIZES}
             className="contact-card__image"
+            style={{ objectPosition: "50% 45%" }}
           />
         }
       />
@@ -196,7 +207,7 @@ export function ContactCards() {
         index={2}
         title="Bizi Ziyaret Edin"
         icon={PinIcon}
-        iconTone="magenta"
+        iconTone="turquoise"
         info={
           <p>
             {contactAddressLines.map((line) => (

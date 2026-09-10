@@ -36,6 +36,14 @@ export type Service = {
       ox/oy sabit kalan noktadır; görüntü oradan büyür. Kaynak dosya
       değişmez. */
   tileFrame?: { zoom: number; ox: string; oy: string };
+  /** Ana sayfa v2 kompozisyonuna özel görsel. Yalnızca öne çıkan dört
+      hizmette doludur; hero posterleri, /hizmetler galerisi ve kart
+      görselleri bu alandan etkilenmez. */
+  homeImage?: string;
+  /** homeImage'in masaüstü kadrajı. Bileşen bunu figure üzerinde
+      --focal olarak yayar; mobilde farklı kadraj gereken panel kuralı
+      aynı değişkeni img üzerinde yeniden tanımlar (bkz. globals.css). */
+  homeFocalPoint?: string;
 };
 
 export const services: Service[] = [
@@ -59,6 +67,8 @@ export const services: Service[] = [
     galleryFocalPoint: "52% 42%",
     tileImage:
       "/media/esteelitta-hizmet-gorselleri-v1/01-lazer-epilasyon.png",
+    homeImage: "/media/homepage-v2/01-lazer-epilasyon-v1.webp",
+    homeFocalPoint: "62% 50%",
   },
   {
     id: "02",
@@ -78,6 +88,8 @@ export const services: Service[] = [
     tileFocalPoint: "52% 46%",
     galleryFocalPoint: "56% 44%",
     tileImage: "/media/esteelitta-hizmet-gorselleri-v1/02-cilt-bakimi.png",
+    homeImage: "/media/homepage-v2/02-cilt-bakimi-v1.webp",
+    homeFocalPoint: "50% 50%",
   },
   {
     id: "03",
@@ -118,6 +130,11 @@ export const services: Service[] = [
     tileFocalPoint: "54% 44%",
     galleryFocalPoint: "50% 38%",
     tileImage: "/media/esteelitta-hizmet-gorselleri-v1/04-kalici-makyaj.png",
+    homeImage: "/media/homepage-v2/04-kalici-makyaj-v1.webp",
+    // Kaynak 2.33 oranında; dört kolonlu (0.89) ve mobil (1.09) kadrajda
+    // 50% yatay odakta kare boş havluyla doluyor, kaş sağ kenardan
+    // taşıyordu. Odak konuya kaydırıldı.
+    homeFocalPoint: "80% 55%",
   },
   {
     id: "05",
@@ -137,6 +154,11 @@ export const services: Service[] = [
     tileFocalPoint: "57% 46%",
     galleryFocalPoint: "58% 46%",
     tileImage: "/media/esteelitta-hizmet-gorselleri-v1/05-sac-tasarimi.png",
+    homeImage: "/media/homepage-v2/03-sac-tasarimi-v1.webp",
+    // Sabit yükseklikli hizmet bandı 809px altında tek kolona düşüp
+    // 2.27 orana çıkıyor; 50% dikey odakta gözler kadraj dışında
+    // kalıyordu. Odak yukarı alınınca yüz her kırılımda kadrajda kalır.
+    homeFocalPoint: "50% 18%",
   },
   {
     id: "06",
@@ -202,3 +224,19 @@ export const services: Service[] = [
     tileFrame: { zoom: 1.18, ox: "100%", oy: "100%" },
   },
 ];
+
+/** Ana sayfada gösterilen hizmetler.
+
+    Seçim kimlik üzerindendir, dizinin ilk dördü değildir: sıra buradaki
+    sıradır ve bir hizmeti değiştirmek tek bir id'yi değiştirmek demektir.
+    Saç Tasarımı (05) üçüncü, Kalıcı Makyaj (04) dördüncü sırada durur;
+    numaralar sıralamayı değil kimliği taşır. */
+export const featuredServiceIds = ["01", "02", "05", "04"] as const;
+
+export const featuredServices: Service[] = featuredServiceIds.map((id) => {
+  const service = services.find((item) => item.id === id);
+  if (!service) {
+    throw new Error(`Öne çıkan hizmet bulunamadı: ${id}`);
+  }
+  return service;
+});

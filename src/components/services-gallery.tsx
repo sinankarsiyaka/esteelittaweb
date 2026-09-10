@@ -40,6 +40,21 @@ const FIGURE_SIZES = [
    (bkz. next.config.ts içindeki images.qualities allowlist'i). */
 const FIGURE_QUALITY = 90;
 
+/* loading="eager" kasıtlıdır: next/image'ın varsayılanı olan tarayıcı
+   yerel loading="lazy"'si, sayfadaki Lenis yumuşak kaydırmasıyla
+   ölçülerek doğrulandı — Lenis kaydırmayı kendi RAF döngüsüyle
+   sürdüğü için tarayıcının IntersectionObserver tabanlı gecikmeli
+   yükleme sinyali gerçek zamanlı fare tekerleği kaydırmasında çok geç
+   tetikleniyor (bazı ölçümlerde kullanıcı görseli tamamen geçene kadar
+   hiç istek atılmıyor). Bu galeri sayfanın esas içeriği ve neredeyse
+   her ziyaretçi buraya kadar kaydırıyor; sekiz görsel toplamda ~200KB
+   (her biri ~20-30KB) olduğu için erken yüklemenin maliyeti düşük,
+   kazancı ise "kaydırırken görsel geç geliyor" hissini tamamen ortadan
+   kaldırmak. priority değil: preload linki veya fetchPriority=high
+   eklemez, hero'nun kendi priority'siyle bant genişliği için
+   yarışmaz. */
+const FIGURE_LOADING = "eager" as const;
+
 /* Sekiz hizmet dört düete ayrılır; satır ayırıcısı ve iki hizmet
    arasındaki ince dikey aks bu kabuğa aittir. */
 const PAIRS = [0, 2, 4, 6].map((start) => services.slice(start, start + 2));
@@ -56,7 +71,7 @@ export function ServicesGallery() {
             const [firstLine, secondLine] = titleLines(service.name);
 
             return (
-              <Reveal
+              <Reveal once
                 key={service.id}
                 className={`duet__entry duet__entry--${
                   column === 0 ? "left" : "right"
@@ -72,6 +87,7 @@ export function ServicesGallery() {
                       fill
                       sizes={FIGURE_SIZES}
                       quality={FIGURE_QUALITY}
+                      loading={FIGURE_LOADING}
                       style={{ objectPosition: service.sceneFocalPoint }}
                     />
                   </span>

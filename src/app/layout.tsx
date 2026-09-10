@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Poppins } from "next/font/google";
 
+import { SiteHeader } from "@/components/site-header";
+
 import "./globals.css";
 
 const display = Playfair_Display({
@@ -27,7 +29,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     /* data-scroll-behavior: sayfa içi çıpalarda yumuşak kaydırma korunur,
        ancak sayfalar arası geçişte Next.js anlık başa dönüşü uygular. */
     <html lang="tr" data-scroll-behavior="smooth">
-      <body className={`${display.variable} ${sans.variable}`}>{children}</body>
+      <body className={`${display.variable} ${sans.variable}`}>
+        {/* Header bütün sayfalarda ortaktır ve <main>'in dışında durur:
+            hiçbir bölüm yığınının (stacking context) altında kalmaz,
+            sayfalar arasında yeniden kurulmaz. Aktif öğe adresten
+            okunur. */}
+        <SiteHeader />
+        {children}
+      </body>
     </html>
   );
 }

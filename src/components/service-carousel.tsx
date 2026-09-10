@@ -294,6 +294,7 @@ function ServiceCard({
     // de aria-hidden/play/pause komutları yalnızca gerçekten değiştiğinde
     // DOM'a/medyaya yazılır.
     let lastHidden: boolean | undefined;
+    let lastFaded: boolean | undefined;
     let lastPlaying: boolean | undefined;
     // Her play/pause yön değişiminde artar (yalnızca play'de değil). Geç
     // gelen bir play() isteği çözüldüğünde bu değer ilerlemişse, aradan
@@ -306,11 +307,30 @@ function ServiceCard({
 
       const card = cardRef.current;
       if (card) {
-        const hidden = getOpacity(angle, layout.mode) === 0;
+        const cardOpacity = getOpacity(angle, layout.mode);
+        const hidden = cardOpacity === 0;
         if (hidden !== lastHidden) {
           lastHidden = hidden;
           if (hidden) card.setAttribute("aria-hidden", "true");
           else card.removeAttribute("aria-hidden");
+        }
+
+        // Dış halkadaki kartlar kompozisyonun derinlik ipucudur ve
+        // opaklıkları 1'in altına iner (dış yuvada ~0.29). Opaklık
+        // kartın tamamına uygulandığı için içindeki başlık bunu aşamaz:
+        // hiçbir kontrast perdesi o metni okunur yapamaz, yalnızca
+        // kartın kendi opaklığını değiştirmek yapabilirdi — o da hero
+        // kompozisyonunu değiştirmek olurdu.
+        //
+        // Bu yüzden okunamayacak kadar solmuş kartın başlığı gizlenir.
+        // Kart, görseli ve derinlikteki yeri aynen kalır; yalnızca
+        // okunamayan (ve mobilde kelime ortasından kırpılan) metin
+        // düşer. Tam opak kartların başlıkları etkilenmez.
+        const faded = cardOpacity < 0.9;
+        if (faded !== lastFaded) {
+          lastFaded = faded;
+          if (faded) card.setAttribute("data-faded", "true");
+          else card.removeAttribute("data-faded");
         }
       }
 
