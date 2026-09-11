@@ -1158,6 +1158,26 @@ main {
   margin-top: clamp(40px, 4.4vw, 64px);
 }
 
+/* Kare marka görseli: kolonu tamamen doldurur, diğer iki kartla aynı
+   yarıçapı taşır. Kendi kenarlığı/gölgesi yok — fotoğrafın kendisi
+   yüzeydir. Grid satırı `stretch` (varsayılan) olduğu için bu öğe
+   satırdaki en uzun öğe olduğunda (tipik durum) kendi kare oranıyla
+   satır yüksekliğini belirler; ortadaki ve sağdaki kartlar ona hizalanır. */
+.pv-about__image {
+  grid-column: 1 / 5;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: var(--pv-radius);
+}
+
+.pv-about__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 40%;
+}
+
 .pv-statement {
   display: flex;
   flex-direction: column;
@@ -1182,11 +1202,15 @@ main {
 .pv-about__facts {
   display: grid;
   grid-column: 9 / 13;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: var(--pv-gap);
   align-content: start;
 }
 
 .pv-fact {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding: 22px 24px;
   border-radius: var(--pv-radius);
 }
@@ -1910,12 +1934,23 @@ main {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  /* Üç kolonluk kart kümesi ikiye iner: 1. satırda görsel + ifade kartı
+     yan yana, 2. satırda iki ilke kartı yan yana. `.pv-about__facts`
+     kendi kutusunu bırakır (`display: contents`) ve iki çocuğu doğrudan
+     `.pv-about__cards`ın ızgarasına katılır; DOM sırası (görsel, ifade,
+     kart 1, kart 2) + iki kolonlu auto-flow ikinci satırı kendiliğinden
+     doldurur, ayrı bir grid-row/column belirtmeye gerek kalmaz. */
+  .pv-about__cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pv-about__image,
   .pv-statement {
-    grid-column: 1 / 8;
+    grid-column: auto;
   }
 
   .pv-about__facts {
-    grid-column: 8 / 13;
+    display: contents;
   }
 
   .pv-about__head .pv-kicker {
@@ -1977,9 +2012,19 @@ main {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .pv-about__image,
   .pv-statement,
   .pv-about__facts {
     grid-column: 1;
+  }
+
+  /* Tablet kırılımındaki `display: contents` burada geri alınır: tek
+     kolonda görsel → ifade kartı → kart 1 → kart 2 sırası, facts kendi
+     kutusunu (iki kartı üst üste dizen kendi mini-ızgarasını) yeniden
+     kazanır. */
+  .pv-about__facts {
+    display: grid;
+    grid-template-rows: none;
   }
 
   .pv-services__grid,
