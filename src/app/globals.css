@@ -116,6 +116,12 @@
 
 html {
   scroll-behavior: smooth;
+  /* Yüzen header `position: fixed` olduğu için akıştan çıkar; çapa
+     kaydırması (#hakkimizda, #surec, hızlı-Tab hedefleri) olmasa hedefin
+     üst kenarını viewport'un 0'ına oturtur ve header onu kapatır. Kapsül
+     yüksekliği bu üç kırılımda değişir (bkz. --hd-bar); değer ölçülen
+     kapsül alt kenarına ~16px güvenli boşluk eklenerek sabitlenir. */
+  scroll-padding-top: 100px;
 }
 
 body {
@@ -635,16 +641,45 @@ main {
   margin-top: -5px;
 }
 
+/* CLS düzeltmesi: bu üç değişken, service-carousel.tsx'teki getLayout()
+   formülünün merkez/tablet moduna (≥650px) karşılık gelen CSS-only
+   yaklaşımıdır. React, gerçek viewport ölçülüp `ready` olana kadar
+   --card-height/--carousel-lead/--control-gap'ı hiç yazmaz; o ana kadar
+   bu değişkenler (JS'in kendi 1440×900 varsayılanı değil) devreye girer.
+   `ready` olduğunda JS aynı formülü gerçek ölçüyle hesaplayıp üzerine
+   yazar — akış yüksekliği ilk boyamadan beri zaten doğru olduğu için
+   görünür bir sıçrama olmaz. Kartların kendisi bu süre boyunca
+   opacity:0'dır (aşağıda), bu yüzden kart geometrisinin bu ara adımda
+   yanlış olması görünürde bir şeye karşılık gelmez. */
 .service-carousel {
+  --sc-wide: clamp(0, (100vw - 920px) / 520px, 1);
+  --sc-base-width: min(238px, 29vw);
+  --sc-byheight: calc((100svh - 300px) / 1.43);
+  --sc-extended-width: calc(var(--sc-base-width) + 102px * var(--sc-wide));
+  --sc-width-css: max(var(--sc-base-width), min(var(--sc-extended-width), var(--sc-byheight)));
+  --sc-height-css: calc(var(--sc-width-css) * 1.43);
+  --sc-lead-css: calc(22px + 4px * var(--sc-wide));
+  --sc-gap-css: clamp(24px, 24px + (100svh - 700px) * 0.166667, 48px);
+
   position: relative;
   width: 100%;
   min-height: calc(
-    var(--carousel-lead, 0px) + var(--card-height, 370px) +
-      var(--control-gap, 48px) + 42px
+    var(--carousel-lead, var(--sc-lead-css)) +
+      var(--card-height, var(--sc-height-css)) +
+      var(--control-gap, var(--sc-gap-css)) + 42px
   );
   opacity: 0;
   transform-style: preserve-3d;
   transition: opacity 280ms ease;
+}
+
+/* getLayout()'un "phone" dalı (viewportWidth < 650) ile aynı eşik. */
+@media (max-width: 649px) {
+  .service-carousel {
+    --sc-width-css: min(248px, 64vw);
+    --sc-height-css: calc(var(--sc-width-css) * 1.43);
+    --sc-lead-css: 0px;
+  }
 }
 
 .service-carousel.is-ready {
@@ -2483,6 +2518,10 @@ main {
     --hd-brand: 52px;
   }
 
+  html {
+    scroll-padding-top: 98px;
+  }
+
   .site-header__bar {
     grid-template-columns: 1fr auto;
   }
@@ -2522,6 +2561,10 @@ main {
     --hd-pad-y: 8px;
     --hd-pad-left: 16px;
     --hd-brand: 46px;
+  }
+
+  html {
+    scroll-padding-top: 90px;
   }
 
   .header-slot {

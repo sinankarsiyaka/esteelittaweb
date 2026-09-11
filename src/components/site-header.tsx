@@ -40,6 +40,16 @@ function activeFromPath(pathname: string): NavId | undefined {
   return match?.id;
 }
 
+/** Rota → "ana içeriğe geç" hedefi. Her sayfanın kendi ana içerik
+    başlangıcı (`tabIndex={-1}` taşıyan öğe) buraya bağlanır. Ana sayfada
+    mevcut `#hakkimizda` davranışı korunur. */
+function skipTargetId(pathname: string): string {
+  if (pathname.startsWith("/hakkimizda")) return "hakkimizda-basi";
+  if (pathname.startsWith("/hizmetler")) return "hizmetler-basi";
+  if (pathname.startsWith("/iletisim")) return "iletisim-basi";
+  return "hakkimizda";
+}
+
 const FOCUSABLE =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -174,15 +184,13 @@ export function SiteHeader() {
 
   return (
     <>
-      {/* Ana sayfada "ana içeriğe geç" bağlantısı header'ın önünde durur:
-          klavye kullanıcısı logoyu, menüyü ve randevu düğmesini tek
-          adımda geçer. Header artık layout'ta olduğu için bu bağlantı da
-          onunla birlikte taşındı; hedefi değişmedi. */}
-      {isHome ? (
-        <a className="skip-link" href="#hakkimizda">
-          Ana içeriğe geç
-        </a>
-      ) : null}
+      {/* "Ana içeriğe geç" bağlantısı header'ın önünde durur: klavye
+          kullanıcısı logoyu, menüyü ve randevu düğmesini tek adımda
+          geçer. Dört sayfanın da kendi ana içerik başlangıcı vardır;
+          hedef adrese göre değişir (bkz. skipTargetId). */}
+      <a className="skip-link" href={`#${skipTargetId(pathname)}`}>
+        Ana içeriğe geç
+      </a>
 
       <header className="site-header">
         <div

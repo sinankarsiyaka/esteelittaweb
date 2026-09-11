@@ -23,7 +23,12 @@ export function AboutIntro() {
   const marqueeItems = services.map((service) => service.name);
 
   return (
-    <section className="pv pv-about" id="hakkimizda" aria-labelledby="pv-about-title">
+    <section
+      className="pv pv-about"
+      id="hakkimizda"
+      aria-labelledby="pv-about-title"
+      tabIndex={-1}
+    >
       <div className="pv-shell">
         <div className="pv-about__head">
           <PvReveal className="pv-kicker" distance="text">

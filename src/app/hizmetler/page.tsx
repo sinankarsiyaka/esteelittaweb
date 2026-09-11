@@ -51,7 +51,7 @@ export default function HizmetlerPage() {
         <style>{".reveal{opacity:1;transform:none}.reveal .mask-line{clip-path:none}.reveal .reveal-zoom{transform:none}.reveal .duet__photo{clip-path:none}"}</style>
       </noscript>
 
-      <section className="hizmetler-hero" id={TOP_ID}>
+      <section className="hizmetler-hero" id={TOP_ID} tabIndex={-1}>
         <HeaderSlot />
         <div className="hizmetler-hero__topline" aria-hidden="true" />
 
