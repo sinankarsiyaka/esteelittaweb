@@ -4716,12 +4716,17 @@ main {
   }
 }
 
-/* ── Mobil (referans: 390px) ────────────────────────────────────────── */
-@media (max-width: 649px) {
-  .iletisim-kanallar__title {
-    text-wrap: pretty;
-  }
+/* ── İletişim kartları: tek kolonlu yatay düzen ───────────────────────
+   320–809px arası kart tek sütunda kalır, içeride solda metin + sağda
+   medya/harita. 810px ve üstünde temel kural (.contact-cards) üç kartlı
+   masaüstü gride döner.
 
+   Eşik 649'dan 809'a genişletildi: 650-809 arasında üç kart yan yana
+   sıkışıyor, "info@esteelitta.com" kendi içerik kutusunu ~13px taşırıyor
+   ve 649→650 geçişinde düzen aniden bozuluyordu. 809, sayfanın diğer
+   bölümlerinde de (örn. .deger, satır ~4647) kullanılan mobil/tablet
+   sınırıyla aynı. */
+@media (max-width: 809px) {
   /* Kartlar kompakt yatay düzene geçer: solda ikon + metin, sağda görsel.
      Referansta kart 356×178, iç boşluk 14px, görsel sütunu ~132px. */
   .contact-cards {
@@ -4748,10 +4753,25 @@ main {
     justify-content: space-between;
     min-height: 130px;
     margin-bottom: 0;
+    /* Grid hücresi flex öğesinin içeriğine göre büyümesin; aksi hâlde
+       uzun e-posta/adres metni sütunu genişletip medya alanını
+       kart dışına iter. */
+    min-width: 0;
+  }
+
+  .contact-card__text {
+    min-width: 0;
   }
 
   .contact-card__info {
     margin-top: 8px;
+    min-width: 0;
+  }
+
+  .contact-card__info p,
+  .contact-card__info span {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .contact-card__info p {
@@ -4761,8 +4781,17 @@ main {
 
   /* Yükseklik oranla sabitlenir. Aksi hâlde dikey kaynak görsel
      (1024×1536) kendi doğal oranıyla kartı uzatır ve üç kart farklı
-     yükseklikte kalır. */
+     yükseklikte kalır.
+
+     width/min-width/margin masaüstü kuralını (satır ~4444) sıfırlar:
+     oradaki negatif margin, medyayı kartın dolgusunun dışına taşırıp
+     üst üste kolonlu bir gride tam sığdırmak için vardı; mobildeki
+     2 kolonlu (metin + medya) grid hücresinde aynı negatif değer
+     medya kutusunu hücre sınırının dışına, kartın sağından taşırıyordu. */
   .contact-card__media {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
     aspect-ratio: 132 / 154;
     height: auto;
     border-radius: 12px;
@@ -4781,6 +4810,13 @@ main {
   .contact-card__map-pill svg {
     width: 9px;
     height: 9px;
+  }
+}
+
+/* ── Mobil (referans: 390px) ────────────────────────────────────────── */
+@media (max-width: 649px) {
+  .iletisim-kanallar__title {
+    text-wrap: pretty;
   }
 
   .iletisim-cta__inner {
