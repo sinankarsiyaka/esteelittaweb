@@ -1033,6 +1033,39 @@ main {
   transform: translate3d(0, 0, 0);
 }
 
+/* ══ Görsel hover yakınlaşması — Seviye A ═══════════════════════════════
+   Site genelinde "seçici" hover sistemi: kendi overflow:hidden medya
+   kutusunda duran, scroll motion taşımayan statik/çerçeveli görseller
+   (ana sayfa Hakkımızda görseli, büyük marka yaklaşımı görseli, süreç
+   kartları, danışan deneyimi görseli, öne çıkan hizmet kartları,
+   /hizmetler sayfasındaki statik görseller). Tek ortak sınıf; her
+   bileşende ayrı ayrı kopyalanmaz.
+
+   ApproachStage/StoryBand/SpaceDuet/hero carousel/İletişim kartları gibi
+   kendi scroll/crossfade/hover hareketini zaten taşıyan görseller bu
+   sınıfı ALMAZ — ek bir transform katmanı orada hareket çakışması
+   yaratır (bkz. Seviye B, kod incelemesi raporunda). */
+@media (hover: hover) and (pointer: fine) {
+  .hover-zoom {
+    overflow: hidden;
+  }
+
+  .hover-zoom img {
+    transition: transform 550ms var(--ease-calm);
+  }
+
+  .hover-zoom:hover img {
+    transform: scale(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-zoom:hover img {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* ══ Paylaşılan tipografi ve parçalar ═════════════════════════════════ */
 
 /* Kicker referansta büyük harf değil: nokta işareti + cümle düzeni. */
@@ -4950,6 +4983,14 @@ main {
   border-radius: 0;
 }
 
+/* Yalnızca bu bant için daha kısa açılma: ölçüm, görselin (eager
+   yükleme sayesinde artık büyük ölçüde önden hazır olsa da) maskenin
+   genel 1.15s süresi boyunca gereksiz yere bekletildiğini gösterdi.
+   Genel .story-band__mask (hero panoraması) süresine dokunulmaz. */
+.hk-bleed .story-band__mask {
+  transition: clip-path 780ms var(--ease-calm);
+}
+
 .hk-manifesto__inner {
   display: grid;
   grid-template-columns: var(--hk-rail) minmax(0, 1fr);
@@ -5059,18 +5100,22 @@ main {
 
 /* Her ilke, yapışkan görselin yanında tek başına okunacak kadar yer
    kaplar. Metin sütununun toplam yüksekliği görselden belirgin biçimde
-   fazladır; görselin yapışıp yol alacağı mesafe buradan doğar. */
-/* Yapışkan görsel korunur: okunan ilkeye cevap veren fotoğraf bu
-   sayfanın imza anıdır. Değişen tek şey blok yüksekliği. 44vh'lik taban
-   üç bloğu 1188px'e çıkarıyordu; yapışkan görsel 630px olduğu için
-   kolonun altında ~930px boş alan kalıyordu. Yeni değer bu boşluğu
-   yarıya indirir, ilkeler arasındaki nefesi korur. */
+   fazladır; görselin yapışıp yol alacağı mesafe buradan doğar.
+
+   Ölçüldü: `useScroll` "start start"/"end end" ilerlemesi, ızgaranın
+   TOPLAM yüksekliği ile viewport yüksekliği arasındaki farka bağlıdır.
+   Önceki 31vh tabanı 1280×800'te 4px, 1440×900'te -63px, 1440×1080'te
+   -76px'lik bir kaydırma yoluna denk geliyordu — yani ikinci fotoğrafın
+   "tam görünür" penceresi pratikte 0-1px'e düşüyordu (ApproachStage'in
+   THRESHOLDS'u rastgele değiştirilmeden, kök neden burada düzeltildi).
+   74vh, 700-1080px yükseklik aralığının tamamında ~800-1250px'lik
+   gerçek bir kaydırma yolu üretir. */
 .approach__block {
   display: flex;
   flex-direction: column;
   grid-column: 2;
   justify-content: center;
-  min-height: max(268px, 31vh);
+  min-height: max(240px, 74vh);
   padding-left: clamp(22px, 2.6vw, 38px);
   border-left: 1px solid var(--line);
 }

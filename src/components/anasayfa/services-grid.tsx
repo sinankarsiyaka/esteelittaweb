@@ -56,7 +56,7 @@ export function ServicesGrid() {
         <ul className="pv-services__grid">
           {featuredServices.map((service, index) => (
             <PvReveal as="li" className="pv-card" key={service.id} order={index}>
-              <span className="pv-card__media">
+              <span className="pv-card__media hover-zoom">
                 {/* Künye görünür metin olarak zaten okunuyor; görsel bu
                     yüzden dekoratif işaretlenir. */}
                 <Image
@@ -64,6 +64,7 @@ export function ServicesGrid() {
                   alt=""
                   fill
                   sizes={SIZES}
+                  quality={90}
                   style={{ objectPosition: service.homeFocalPoint }}
                 />
               </span>

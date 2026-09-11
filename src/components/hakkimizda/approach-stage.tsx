@@ -45,11 +45,20 @@ export type ApproachItem = {
 };
 
 /** İkinci ve üçüncü fotoğrafın üstteki katman olarak açıldığı kaydırma
-    eşikleri. Birinci fotoğraf zemin katmanıdır, eşiği yoktur. */
+    eşikleri. Birinci fotoğraf zemin katmanıdır, eşiği yoktur.
+
+    Simetrik ve dengeli: her iki geçiş de aynı payı (0.10) kaplar, ikinci
+    fotoğrafın "tam görünür" penceresi (0.34→0.66 = 0.32) ve birinci/
+    üçüncünün durgun fazları (0.24 ve 0.24) birbirine yakın. Bu oranlar
+    kendi başına yeterli değildi — .approach__block'un yüksekliği
+    (globals.css) gerçek kaydırma yolunu (px) neredeyse sıfıra
+    düşürüyordu; asıl düzeltme orada. Buradaki tek değişiklik, geçişleri
+    (0.30-0.42 / 0.62-0.74 → 0.24-0.34 / 0.66-0.76) yeni orana göre
+    simetrikleştirmek. */
 const THRESHOLDS: [number, number][] = [
   [0, 0],
-  [0.3, 0.42],
-  [0.62, 0.74],
+  [0.24, 0.34],
+  [0.66, 0.76],
 ];
 
 /** from ile to arasında 0'dan 1'e giden, dışında kırpılan doğrusal rampa. */

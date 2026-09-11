@@ -67,12 +67,18 @@ export function ProcessSteps() {
                 ))}
               </ul>
 
-              <span className="pv-step__media">
+              <span className="pv-step__media hover-zoom">
                 <Image
                   src={step.image}
                   alt={step.alt}
                   fill
-                  sizes="(min-width: 1200px) 423px, (min-width: 810px) 44vw, calc(100vw - 88px)"
+                  /* Ölçüldü: .pv-shell 1200px'te tavana ulaştığı için
+                     bu kolon ≥1200px'te viewport'tan bağımsız ~630px'te
+                     sabitleniyor. Eski "423px" ipucu gerçek genişlikten
+                     ~200px azdı; tarayıcı bu yüzden gereğinden küçük bir
+                     srcset adayı seçip görseli hafifçe büyütüyordu. */
+                  sizes="(min-width: 1200px) 630px, (min-width: 810px) 44vw, calc(100vw - 88px)"
+                  quality={90}
                   style={{ objectPosition: step.focalPoint }}
                 />
               </span>

@@ -37,6 +37,15 @@ type Props = {
   priority?: boolean;
   /** Kenardan kenara kullanım gibi ölçü farkları için ek sınıf. */
   className?: string;
+  /** Native `loading="lazy"` bu bantta ölçülen bir sorunun kaynağıydı:
+      Lenis'in RAF tabanlı kaydırması, tarayıcının IntersectionObserver
+      tabanlı "yaklaşınca yükle" sezgisini normal bir kaydırmada olduğu
+      gibi tetiklemiyor — maske %15 görünürlükte açılmaya başlıyor ama
+      görsel isteği çok daha sonra atılıyor (bkz. services-gallery.tsx'te
+      aynı sınıf sorun için zaten uygulanmış `loading="eager"` gerekçesi).
+      `priority` değil: preload linki veya fetchPriority=high eklemez,
+      yalnızca native lazy-load gecikmesini kaldırır. */
+  eager?: boolean;
 };
 
 export function StoryBand({
@@ -46,6 +55,7 @@ export function StoryBand({
   height,
   priority,
   className,
+  eager,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const isOpen = useInView(ref, { once: true, amount: 0.15 });
@@ -81,6 +91,7 @@ export function StoryBand({
             }
             quality={90}
             priority={priority}
+            loading={priority ? undefined : eager ? "eager" : "lazy"}
           />
         </motion.div>
       </div>

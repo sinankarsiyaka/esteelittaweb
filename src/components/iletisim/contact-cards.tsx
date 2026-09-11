@@ -170,6 +170,7 @@ export function ContactCards() {
             width={1122}
             height={1402}
             sizes={MEDIA_SIZES}
+            quality={90}
             className="contact-card__image"
             style={{ objectPosition: "50% 40%" }}
           />
@@ -192,11 +193,12 @@ export function ContactCards() {
              ulaşınca geleceğiniz yer" anlamını taşır ve resepsiyon
              görseli artık yalnızca /hakkimizda'ya ait. */
           <Image
-            src="/media/homepage-v2/06-kapanis-atmosfer-v1.webp"
+            src="/media/homepage-v2/06-kapanis-atmosfer-v2.jpg"
             alt="Esteelitta bakım odasının temsili görünümü: tül perdeli geniş pencere, gün ışığı ve arkada İstanbul manzarası."
             width={1774}
             height={887}
             sizes={MEDIA_SIZES}
+            quality={90}
             className="contact-card__image"
             style={{ objectPosition: "50% 45%" }}
           />

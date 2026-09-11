@@ -67,7 +67,7 @@ export const services: Service[] = [
     galleryFocalPoint: "52% 42%",
     tileImage:
       "/media/esteelitta-hizmet-gorselleri-v1/01-lazer-epilasyon.png",
-    homeImage: "/media/homepage-v2/01-lazer-epilasyon-v1.webp",
+    homeImage: "/media/homepage-v2/01-lazer-epilasyon-v2.jpg",
     homeFocalPoint: "62% 50%",
   },
   {
@@ -88,7 +88,7 @@ export const services: Service[] = [
     tileFocalPoint: "52% 46%",
     galleryFocalPoint: "56% 44%",
     tileImage: "/media/esteelitta-hizmet-gorselleri-v1/02-cilt-bakimi.png",
-    homeImage: "/media/homepage-v2/02-cilt-bakimi-v1.webp",
+    homeImage: "/media/homepage-v2/02-cilt-bakimi-v2.jpg",
     homeFocalPoint: "50% 50%",
   },
   {
@@ -130,7 +130,7 @@ export const services: Service[] = [
     tileFocalPoint: "54% 44%",
     galleryFocalPoint: "50% 38%",
     tileImage: "/media/esteelitta-hizmet-gorselleri-v1/04-kalici-makyaj.png",
-    homeImage: "/media/homepage-v2/04-kalici-makyaj-v1.webp",
+    homeImage: "/media/homepage-v2/04-kalici-makyaj-v2.jpg",
     // Kaynak 2.33 oranında; dört kolonlu (0.89) ve mobil (1.09) kadrajda
     // 50% yatay odakta kare boş havluyla doluyor, kaş sağ kenardan
     // taşıyordu. Odak konuya kaydırıldı.
@@ -154,7 +154,7 @@ export const services: Service[] = [
     tileFocalPoint: "57% 46%",
     galleryFocalPoint: "58% 46%",
     tileImage: "/media/esteelitta-hizmet-gorselleri-v1/05-sac-tasarimi.png",
-    homeImage: "/media/homepage-v2/03-sac-tasarimi-v1.webp",
+    homeImage: "/media/homepage-v2/03-sac-tasarimi-v2.jpg",
     // Sabit yükseklikli hizmet bandı 809px altında tek kolona düşüp
     // 2.27 orana çıkıyor; 50% dikey odakta gözler kadraj dışında
     // kalıyordu. Odak yukarı alınınca yüz her kırılımda kadrajda kalır.

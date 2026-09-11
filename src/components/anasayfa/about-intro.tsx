@@ -51,13 +51,14 @@ export function AboutIntro() {
         </PvReveal>
 
         <div className="pv-about__cards">
-          <PvReveal className="pv-about__image">
+          <PvReveal className="pv-about__image hover-zoom">
             <Image
               src="/media/homepage-about-v1/01-dogal-yaklasim-v1.jpg"
               alt="Aydınlık bir güzellik stüdyosunda danışan ile uzmanın bakım seçeneklerini birlikte değerlendirdiği temsili an."
               width={1254}
               height={1254}
               sizes="(min-width: 1200px) 390px, (min-width: 810px) 46vw, calc(100vw - 40px)"
+              quality={90}
             />
           </PvReveal>
 
