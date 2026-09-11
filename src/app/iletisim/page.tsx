@@ -21,7 +21,7 @@ const TOP_ID = "iletisim-basi";
     çalışır; başlıklar, şeritler ve CTA sunucuda render edilir. */
 export default function IletisimPage() {
   return (
-    <main className="iletisim-main" id={TOP_ID}>
+    <main className="iletisim-main" id={TOP_ID} tabIndex={-1}>
       {/* JavaScript kapalıyken giriş hareketleri uygulanmaz; içerik
           doğrudan okunur durumda kalır. */}
       <noscript>

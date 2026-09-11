@@ -621,9 +621,21 @@ export function ServiceCarousel() {
       style={
         {
           perspective: layout.perspective,
-          "--card-height": `${layout.cardHeight}px`,
-          "--carousel-lead": `${layout.lead}px`,
-          "--control-gap": `${layout.controlGap}px`,
+          // Gerçek viewport ölçülene kadar (ready=false) bu üçü hiç
+          // yazılmaz: `viewport` state'i henüz JS'in 1440×900
+          // varsayılanını taşıyor ve bunu buraya yazmak, sunucu çıktısını
+          // yanlış (masaüstü) geometriyle sabitler (bkz. globals.css'teki
+          // --sc-*-css CLS notu). Yazılmadığında dış yükseklik, aynı
+          // formülün CSS-only karşılığından (gerçek viewport'a göre
+          // anında doğru) gelir; ready olunca JS aynı sonucu üretir ve
+          // sıçrama olmaz.
+          ...(ready
+            ? {
+                "--card-height": `${layout.cardHeight}px`,
+                "--carousel-lead": `${layout.lead}px`,
+                "--control-gap": `${layout.controlGap}px`,
+              }
+            : null),
         } as CSSProperties
       }
     >

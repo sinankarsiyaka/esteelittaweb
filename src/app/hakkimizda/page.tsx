@@ -58,7 +58,7 @@ const approach: ApproachItem[] = [
     kabuğu tarayıcıda çalışır; başlıklar ve metin sunucuda render edilir. */
 export default function HakkimizdaPage() {
   return (
-    <main className="hakkimizda-main" id={TOP_ID}>
+    <main className="hakkimizda-main" id={TOP_ID} tabIndex={-1}>
       {/* JavaScript kapalıyken giriş hareketleri uygulanmaz; içerik
           doğrudan okunur durumda kalır. */}
       <noscript>
