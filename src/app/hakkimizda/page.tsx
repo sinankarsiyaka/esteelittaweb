@@ -128,10 +128,11 @@ export default function HakkimizdaPage() {
             kapanır; sayfadaki tek tam genişlik görseli budur. */}
         <StoryBand
           className="hk-bleed"
-          src="/media/hakkimizda-page-v1/detay-hazirlik-makro.webp"
-          alt="Uygulama öncesi hazırlık: temiz pamuk pedlerin ve çelik kabın taş tezgâhta düzenlendiği temsili an."
-          width={2200}
-          height={1100}
+          src="/media/hakkimizda-page-v1/detay-hazirlik-makro-v2.jpg"
+          alt="Aydınlık bir Esteelitta stüdyosunda, uzman ve danışanın oturarak sakin bir danışma sohbeti yaptığı temsili an."
+          width={1774}
+          height={887}
+          eager
         />
       </section>
 

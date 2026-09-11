@@ -38,13 +38,20 @@ export function ExperienceWall() {
         </div>
 
         <div className="pv-experience__grid">
-          <PvReveal className="pv-featured">
+          <PvReveal className="pv-featured hover-zoom">
+            {/* hover-zoom işaretleyicisi burada, medya kutusunda değil:
+                üstündeki .pv-featured__scrim tüm kutuyu kaplıyor
+                (yalnızca alt üçte biri görünür koyulaşıyor) ve
+                pointer-events'i kapatılmadığı için :hover her zaman
+                buraya, güvenilir şekilde hoverlanabilen dış kutuya
+                düşüyor. */}
             <span className="pv-featured__media">
               <Image
                 src="/media/homepage-v3/04-deneyim-portre-v1.webp"
                 alt="Sakin bir dinlenme anını canlandıran temsili görsel: aydınlık bir odada gözleri kapalı duran bir kişi."
                 fill
                 sizes="(min-width: 1200px) 419px, (min-width: 810px) 46vw, calc(100vw - 40px)"
+                quality={90}
                 style={{ objectPosition: "50% 34%" }}
               />
             </span>

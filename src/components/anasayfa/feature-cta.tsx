@@ -20,12 +20,13 @@ export function FeatureCta() {
   return (
     <section className="pv pv-feature" aria-labelledby="pv-feature-title">
       <div className="pv-shell pv-feature__grid">
-        <PvReveal className="pv-feature__media">
+        <PvReveal className="pv-feature__media hover-zoom">
           <Image
             src="/media/impeccable-final-v1/anasayfa-marka-yaklasimi-renk-v2.webp"
             alt="Danışma anını canlandıran temsili görsel: aydınlık bir odada yan yana oturmuş iki kişi konuşuyor."
             fill
             sizes="(min-width: 1200px) 566px, (min-width: 810px) 46vw, calc(100vw - 40px)"
+            quality={90}
           />
         </PvReveal>
 
